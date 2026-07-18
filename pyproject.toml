@@ -1,7 +1,7 @@
 [project]
 name = "web-recon-kit"
 version = "0.1.0"
-description = "Reusable, target-agnostic web/API security-assessment harness. Consumes polyfetch-scrape (env-borrow) for browser-tier recon; httpx for API probing; configured per target via scope.toml."
+description = "Reusable, target-agnostic web/API security-assessment harness. httpx for the API tier; an optional polyfetch-scrape browser tier (uv sync --extra browser); configured per target via scope.toml."
 requires-python = ">=3.11"
 dependencies = [
     "httpx>=0.27",
@@ -17,6 +17,12 @@ dev = [
 test = [
     "pytest>=8",
     "pytest-asyncio>=0.23",
+]
+# Browser tier (inventory mining, gate classification, screenshots). Pulls polyfetch and its
+# heavy deps (patchright, curl_cffi) — kept OPTIONAL so the API tier stays httpx-only.
+# After `uv sync --extra browser`, run `uv run patchright install chromium` once.
+browser = [
+    "polyfetch-scrape @ git+https://github.com/qte77/polyfetch-scrape.git",
 ]
 
 [tool.uv]
