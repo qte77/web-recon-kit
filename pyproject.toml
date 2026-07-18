@@ -1,0 +1,56 @@
+[project]
+name = "web-recon-kit"
+version = "0.1.0"
+description = "Reusable, target-agnostic web/API security-assessment harness. Consumes polyfetch-scrape (env-borrow) for browser-tier recon; httpx for API probing; configured per target via scope.toml."
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+# Later stages plug in here: `uv sync --extra dev` then `make lint typecheck audit`.
+dev = [
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "pip-audit>=2.7",   # SCA: dependency vulnerability scan
+]
+test = [
+    "pytest>=8",
+    "pytest-asyncio>=0.23",
+]
+
+[tool.uv]
+# Scripts + runners, not an installable library — manage the venv, don't build.
+package = false
+
+# --- Lint ---------------------------------------------------------------
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["."]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "ANN", "S", "RUF", "PTH"]
+ignore = ["ANN401"]  # allow explicit Any where a browser bridge returns it
+
+[tool.ruff.lint.per-file-ignores]
+"runners/r2_schemathesis.sh" = ["ALL"]
+"tests/*" = ["S101", "S105", "S106", "ANN"]
+
+# --- Types (strict) -----------------------------------------------------
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unreachable = true
+files = ["lib", "runners", "inventory", "report.py"]
+
+[[tool.mypy.overrides]]
+# polyfetch / patchright are consumed via env-borrow and not installed here.
+module = ["polyfetch_scrape.*", "patchright.*"]
+ignore_missing_imports = true
+
+# --- Tests --------------------------------------------------------------
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
