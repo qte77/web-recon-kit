@@ -42,15 +42,19 @@ workflow/verify_findings.workflow.js  # agentic adversarial verification (option
 
 ## Two run tiers
 
-- **API tier** (r2/r3, report) — our own venv, dependency `httpx`. `uv run python …`.
-- **Browser tier** (inventory, recon) — env-borrows the polyfetch clone so patchright
-  isn't installed here: `uv run --directory $POLY python …`.
+- **API tier** (r2/r3, report) — needs only `httpx`. `make setup`, then `uv run python …`.
+- **Browser tier** (inventory, recon) — needs the optional `browser` extra, which pulls
+  [polyfetch-scrape][poly] (+ patchright) from GitHub. `make setup-browser` installs it and the
+  Chromium binary; API-tier users can skip it.
+
+[poly]: https://github.com/qte77/polyfetch-scrape
 
 ## Setup
 
 ```bash
 cp scope.example.toml scope.toml   # then fill in base_url, identities, routes, etc.
-uv sync --extra dev                # ruff, mypy, pip-audit
+make setup                         # API tier: ruff, mypy, pip-audit, pytest, httpx
+make setup-browser                 # (optional) browser tier: polyfetch (GitHub) + chromium
 # identities live in the shared .env (never in scope.toml):
 #   the env var named in [identities.owner].env      (required)
 #   the env var named in [identities.tenant_b].env    (for BOLA — provision a 2nd workspace)
@@ -70,8 +74,7 @@ make report           # -> results/report.md
 make all              # authmatrix + cron + bola + bfla + report
 ```
 
-Override the polyfetch location or env file:
-`make inventory POLY=/path/to/polyfetch-scrape ENV=/path/to/.env`.
+Override the env-file location: `make authmatrix ENV=/path/to/.env`.
 
 ## Fork / bulk model
 
