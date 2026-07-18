@@ -1,0 +1,9 @@
+title = "gitleaks config for web-recon-kit"
+
+[extend]
+useDefault = true
+
+# uv.lock contains package integrity hashes (sha256:…) — not secrets.
+[allowlist]
+description = "Lockfile integrity hashes are not secrets."
+paths = ['''uv\.lock''']
