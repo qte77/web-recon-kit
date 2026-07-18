@@ -1,0 +1,19 @@
+# secrets & env
+.env
+*.key
+
+# target-specific config + generated inventory (this harness is target-agnostic;
+# copy scope.example.toml -> scope.toml and fill in your target)
+scope.toml
+inventory/api_endpoints.json
+
+# results (may contain workspace data)
+results/
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/

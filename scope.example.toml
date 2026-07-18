@@ -1,0 +1,63 @@
+# Example assessment-scope config. Copy to scope.toml and fill in your target.
+# API keys are read from the ENVIRONMENT (never store secrets here) — scope.toml
+# itself is git-ignored once you copy it, since it becomes target-specific.
+
+base_url = "https://TARGET.example.com"
+
+# Identities the runners can act as. `env` names the env var holding the bearer
+# token. An identity with an unset env var is simply skipped (runners degrade
+# gracefully). At minimum you need `owner`; `tenant_b` enables BOLA (cross-tenant
+# IDOR) and `lowrole` enables BFLA (function-level authz) checks.
+[identities.owner]
+env = "RECON_API_KEY"        # primary/workspace-A owner token
+role = "owner"
+workspace = "A"
+
+# [identities.tenant_b]
+# env = "RECON_API_KEY_B"    # 2nd workspace owner — required for BOLA
+# role = "owner"
+# workspace = "B"
+
+# [identities.lowrole]
+# env = "RECON_API_KEY_C"    # low-role member of workspace A — required for BFLA
+# role = "member"
+# workspace = "A"
+
+[rate]
+max_concurrency = 8           # bounded worker-pool size for the async client
+per_host_delay_ms = 300       # polite per-host spacing; keeps us far from any DoS threshold
+
+[safety]
+# Runners only ever send these methods. Mutating verbs must never be added here.
+methods = ["GET", "OPTIONS"]
+
+[recon]
+# Routes r1_recon renders + gate-classifies (browser tier). Defaults to ["/"]
+# if omitted.
+routes = ["/", "/login"]
+# Path prefix r2_cron_auth treats as "cron" endpoints. Defaults to "/api/cron/"
+# if omitted.
+cron_prefix = "/api/cron/"
+
+[authmatrix]
+# Endpoints that are public by design — an unauthenticated 200 here is expected,
+# not a finding, for r2_authmatrix. Defaults to [] (nothing whitelisted).
+public_ok = []
+
+[bfla]
+# Path prefixes r3_rbac_bfla treats as admin/RBAC surface. Defaults to
+# ["/api/admin/"] if omitted.
+admin_prefixes = ["/api/admin/"]
+
+# [bola]
+# Collectors r3_bola uses to harvest resource IDs (as `owner`) and then probe
+# them (as `tenant_b`) for cross-tenant leaks. Each collector needs:
+#   kind            - short label for this resource type
+#   list_path       - GET endpoint that lists the collection
+#   collection_key  - key in the JSON body holding the list of items
+#   probe_template  - by-id GET path, with "{id}" as the placeholder
+# [[bola.collectors]]
+# kind = "widget"
+# list_path = "/api/widgets"
+# collection_key = "widgets"
+# probe_template = "/api/widgets/{id}"
