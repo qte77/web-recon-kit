@@ -11,6 +11,12 @@ collectors — lives in `scope.toml`, which you configure per engagement.
 > never triggers cron/mutation endpoints. `results/` may contain workspace data —
 > it is git-ignored. So is `scope.toml` itself, since it captures your target.
 
+## Docs
+
+- [Architecture](docs/architecture.md) — two tiers, components, data flow, config model, CLI/env reference
+- [Roadmap](docs/roadmap.md) · [User stories](docs/userstory.md) · [Glossary](docs/glossary.md)
+- [Changelog](CHANGELOG.md) · [License](LICENSE) (Apache-2.0)
+
 ## Why standalone (not part of polyfetch-scrape)
 
 `polyfetch-scrape` is a **generic** scraping engine; its own docs put "domain API
@@ -21,7 +27,7 @@ polyfetch generic and this repo's intent (and legal scope) clearly separated.
 
 ## Layout
 
-```
+```text
 scope.example.toml          # COMMITTED template — copy to scope.toml per engagement
 scope.toml                  # your target's base_url, identities, rate/safety, routes,
                              #   public-ok list, admin prefixes, BOLA collectors — git-ignored
@@ -42,15 +48,19 @@ workflow/verify_findings.workflow.js  # agentic adversarial verification (option
 
 ## Two run tiers
 
-- **API tier** (r2/r3, report) — our own venv, dependency `httpx`. `uv run python …`.
-- **Browser tier** (inventory, recon) — env-borrows the polyfetch clone so patchright
-  isn't installed here: `uv run --directory $POLY python …`.
+- **API tier** (r2/r3, report) — needs only `httpx`. `make setup`, then `uv run python …`.
+- **Browser tier** (inventory, recon) — needs the optional `browser` extra, which pulls
+  [polyfetch-scrape][poly] (+ patchright) from GitHub. `make setup-browser` installs it and the
+  Chromium binary; API-tier users can skip it.
+
+[poly]: https://github.com/qte77/polyfetch-scrape
 
 ## Setup
 
 ```bash
 cp scope.example.toml scope.toml   # then fill in base_url, identities, routes, etc.
-uv sync --extra dev                # ruff, mypy, pip-audit
+make setup                         # API tier: ruff, mypy, pip-audit, pytest, httpx
+make setup-browser                 # (optional) browser tier: polyfetch (GitHub) + chromium
 # identities live in the shared .env (never in scope.toml):
 #   the env var named in [identities.owner].env      (required)
 #   the env var named in [identities.tenant_b].env    (for BOLA — provision a 2nd workspace)
@@ -70,8 +80,7 @@ make report           # -> results/report.md
 make all              # authmatrix + cron + bola + bfla + report
 ```
 
-Override the polyfetch location or env file:
-`make inventory POLY=/path/to/polyfetch-scrape ENV=/path/to/.env`.
+Override the env-file location: `make authmatrix ENV=/path/to/.env`.
 
 ## Fork / bulk model
 
