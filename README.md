@@ -11,6 +11,12 @@ collectors — lives in `scope.toml`, which you configure per engagement.
 > never triggers cron/mutation endpoints. `results/` may contain workspace data —
 > it is git-ignored. So is `scope.toml` itself, since it captures your target.
 
+## Docs
+
+- [Architecture](docs/architecture.md) — two tiers, components, data flow, config model, CLI/env reference
+- [Roadmap](docs/roadmap.md) · [User stories](docs/userstory.md) · [Glossary](docs/glossary.md)
+- [Changelog](CHANGELOG.md) · [License](LICENSE) (Apache-2.0)
+
 ## Why standalone (not part of polyfetch-scrape)
 
 `polyfetch-scrape` is a **generic** scraping engine; its own docs put "domain API
