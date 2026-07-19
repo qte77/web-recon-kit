@@ -1,8 +1,9 @@
 """(1) Recon: render each route, classify the gate type (public / client-side /
 server-middleware), capture console errors + a screenshot per route.
 
-Browser tier: run via the borrowed polyfetch venv:
-    uv run --directory <polyfetch> python runners/r1_recon.py
+Browser tier: needs the optional `browser` extra (`uv sync --extra browser`
++ `uv run patchright install chromium`), then:
+    uv run python runners/r1_recon.py
 """
 from __future__ import annotations
 

@@ -13,7 +13,8 @@ environment.
 | **Browser** | patchright/Chromium via [polyfetch-scrape][poly] | inventory miner, r1_recon | `make setup-browser` |
 
 The browser tier is an optional `browser` extra so API-tier users never install
-Chromium.
+Chromium. See [polyfetch integration](polyfetch-integration.md) for how the runners
+use polyfetch (bundle mining, gate classification, screenshots).
 
 [poly]: https://github.com/qte77/polyfetch-scrape
 
