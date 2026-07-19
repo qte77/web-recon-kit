@@ -1,0 +1,26 @@
+---
+name: publish-release
+
+# Thin caller: delegates to the estate-standard reusable (qte77/.github).
+# Manually publishes a GitHub Release for an existing tag, with notes from the
+# CHANGELOG.md `## [version]` block (falls back to auto-generated notes if empty).
+# Idempotent — aborts if a Release already exists (never overwrites). Decoupled
+# from tag-release so the default flow stays tag-only. Upstream defaults match
+# (changelog_path CHANGELOG.md, tag_prefix v); only the optional tag is passed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to release (defaults to the latest v* tag)"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    uses: qte77/.github/.github/workflows/publish-release.yml@b03592321e529d0d136b35852fc9045e96c65159  # 2026-07-18
+    with:
+      tag: ${{ inputs.tag }}

@@ -1,5 +1,13 @@
 # web-recon-kit
 
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue)](CHANGELOG.md)
+[![Python](https://img.shields.io/badge/python-3.11+-blue)](pyproject.toml)
+[![CI](https://github.com/qte77/web-recon-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/qte77/web-recon-kit/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/qte77/web-recon-kit/actions/workflows/codeql.yml/badge.svg)](https://github.com/qte77/web-recon-kit/actions/workflows/codeql.yml)
+[![CodeFactor](https://www.codefactor.io/repository/github/qte77/web-recon-kit/badge)](https://www.codefactor.io/repository/github/qte77/web-recon-kit)
+[![Lint MD and Links](https://github.com/qte77/web-recon-kit/actions/workflows/lint-md-links.yml/badge.svg)](https://github.com/qte77/web-recon-kit/actions/workflows/lint-md-links.yml)
+
 A reusable, **target-agnostic** security-assessment harness. Runs the categories
 **(1) recon**, **(2) API testing**, **(3) authz/tenant isolation** in bulk, with a
 deterministic script core plus an optional agentic verification Workflow. Every
@@ -16,7 +24,7 @@ collectors — lives in `scope.toml`, which you configure per engagement.
 - [Architecture](docs/architecture.md) — two tiers, components, data flow, config model, CLI/env reference
 - [polyfetch integration](docs/polyfetch-integration.md) — how the browser tier uses polyfetch-scrape
 - [Roadmap](docs/roadmap.md) · [User stories](docs/userstory.md) · [Glossary](docs/glossary.md)
-- [Changelog](CHANGELOG.md) · [License](LICENSE) (Apache-2.0)
+- [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [License](LICENSE) (Apache-2.0)
 
 ## Why standalone (not part of polyfetch-scrape)
 

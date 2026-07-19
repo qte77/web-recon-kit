@@ -5,7 +5,7 @@ ENV ?= .env
 PY  := uv run python
 LOADENV := set -a; . $(ENV); set +a
 
-.PHONY: setup setup-browser inventory recon authmatrix cron bola bfla report all lint typecheck test audit check clean
+.PHONY: setup setup-browser inventory recon authmatrix cron bola bfla report all lint typecheck test audit check changelog_new changelog_preview changelog_release clean
 
 setup:               ## install dev + test deps (ruff, mypy, pip-audit, pytest)
 	uv sync --extra dev --extra test
@@ -50,6 +50,16 @@ test:                ## pytest smoke tests
 	uv run pytest
 
 check: lint typecheck test audit
+
+changelog_new:       ## create + stage a new changelog fragment (scriv)
+	uv run scriv create --add
+
+changelog_preview:   ## preview the assembled release entry (scriv)
+	uv run scriv print
+
+changelog_release:   ## collect fragments into CHANGELOG.md: make changelog_release VERSION=X.Y.Z
+	test -n "$(VERSION)" || { echo "usage: make changelog_release VERSION=X.Y.Z"; exit 2; }
+	uv run scriv collect --version "$(VERSION)"
 
 clean:
 	rm -rf results __pycache__ */__pycache__ .mypy_cache .ruff_cache

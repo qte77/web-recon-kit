@@ -1,25 +1,22 @@
 # Changelog
 
-Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Date/PR-based until a
-first tagged release.
+All notable changes to this project are documented here.
 
-## [Unreleased]
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### Added
+Types of changes:
 
-- Docs: `docs/architecture.md` (design, config model, CLI/env reference),
-  `docs/roadmap.md`, `docs/userstory.md`, `CHANGELOG.md`, Apache-2.0 `LICENSE`.
-- Docs: `docs/polyfetch-integration.md` — how the browser tier uses polyfetch-scrape
-  (bundle mining, gate classification, screenshots, why polyfetch). Closes #3.
+- `Added` for new features.
+- `Changed` for changes in existing functionality.
+- `Deprecated` for soon-to-be removed features.
+- `Removed` for now removed features.
+- `Fixed` for any bugfixes.
+- `Security` in case of vulnerabilities.
 
-### Fixed
+<!-- scriv-insert-here -->
 
-- Docs: corrected stale `env-borrow` / `POLY=/path` references left after the move to
-  the optional `browser` extra (#5) — README "Why standalone", the `r1_recon` and
-  `build_inventory` docstrings, the mypy-override comment, and the glossary now describe
-  `make setup-browser` / `uv sync --extra browser`.
-
-## 2026-07-18
+## [0.1.0] - 2026-07-19
 
 ### Added
 
@@ -29,3 +26,18 @@ first tagged release.
   `workflow/verify_findings.workflow.js`, `tests/`, `scope.example.toml`.
 - CI: ruff, mypy `--strict`, pytest, pip-audit, CodeQL, gitleaks, Dependabot;
   SHA-pinned actions. Two-tier setup (`make setup` / `make setup-browser`).
+- Docs: `docs/architecture.md` (design, config model, CLI/env reference),
+  `docs/roadmap.md`, `docs/userstory.md`, `docs/glossary.md`,
+  `docs/polyfetch-integration.md` (browser-tier polyfetch usage), `CHANGELOG.md`,
+  Apache-2.0 `LICENSE`.
+- Release automation: estate-standard `bump-my-version` / `tag-release` /
+  `publish-release` workflows (thin callers into `qte77/.github` reusables),
+  `[tool.bumpversion]` + `[tool.scriv]` (`changelog.d/` fragments), a README version
+  badge, and `CONTRIBUTING.md`.
+
+### Fixed
+
+- Docs: corrected stale `env-borrow` / `POLY=/path` references left after the move to
+  the optional `browser` extra (#5) — README "Why standalone", the `r1_recon` and
+  `build_inventory` docstrings, the mypy-override comment, and the glossary now describe
+  `uv sync --extra browser`.
