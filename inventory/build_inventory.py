@@ -1,8 +1,9 @@
 """(Re)build inventory/api_endpoints.json by mining the live JS bundles.
 
 Static analysis of client code the target ships publicly — no API key needed.
-Browser tier: run via the borrowed polyfetch venv:
-    uv run --directory <polyfetch> python inventory/build_inventory.py
+Browser tier: needs the optional `browser` extra (`uv sync --extra browser`
++ `uv run patchright install chromium`), then:
+    uv run python inventory/build_inventory.py
 """
 from __future__ import annotations
 

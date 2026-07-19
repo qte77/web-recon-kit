@@ -61,6 +61,8 @@ each is expanded and briefly defined.
 - **SARIF** — Static Analysis Results Interchange Format. CodeQL's output format.
 - **uv** — the Python package/venv manager used here.
 - **env-borrow** — running a tool from another repo's virtualenv via `uv run --directory <repo>`,
-  so its heavy deps never enter this project's lockfile. See [polyfetch-scrape][poly]'s `USING.md`.
+  so its heavy deps never enter this project's lockfile (a polyfetch-scrape contract; see its
+  `USING.md`). web-recon-kit no longer uses it — polyfetch is now the optional `browser` extra
+  (see [polyfetch integration](polyfetch-integration.md)).
 
 [poly]: https://github.com/qte77/polyfetch-scrape

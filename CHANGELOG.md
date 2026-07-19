@@ -9,6 +9,15 @@ first tagged release.
 
 - Docs: `docs/architecture.md` (design, config model, CLI/env reference),
   `docs/roadmap.md`, `docs/userstory.md`, `CHANGELOG.md`, Apache-2.0 `LICENSE`.
+- Docs: `docs/polyfetch-integration.md` — how the browser tier uses polyfetch-scrape
+  (bundle mining, gate classification, screenshots, why polyfetch). Closes #3.
+
+### Fixed
+
+- Docs: corrected stale `env-borrow` / `POLY=/path` references left after the move to
+  the optional `browser` extra (#5) — README "Why standalone", the `r1_recon` and
+  `build_inventory` docstrings, the mypy-override comment, and the glossary now describe
+  `make setup-browser` / `uv sync --extra browser`.
 
 ## 2026-07-18
 

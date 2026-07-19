@@ -51,7 +51,7 @@ warn_unreachable = true
 files = ["lib", "runners", "inventory", "report.py"]
 
 [[tool.mypy.overrides]]
-# polyfetch / patchright are consumed via env-borrow and not installed here.
+# polyfetch / patchright ship only in the optional `browser` extra, which CI/mypy don't install.
 module = ["polyfetch_scrape.*", "patchright.*"]
 ignore_missing_imports = true
 

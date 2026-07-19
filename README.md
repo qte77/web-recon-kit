@@ -14,6 +14,7 @@ collectors — lives in `scope.toml`, which you configure per engagement.
 ## Docs
 
 - [Architecture](docs/architecture.md) — two tiers, components, data flow, config model, CLI/env reference
+- [polyfetch integration](docs/polyfetch-integration.md) — how the browser tier uses polyfetch-scrape
 - [Roadmap](docs/roadmap.md) · [User stories](docs/userstory.md) · [Glossary](docs/glossary.md)
 - [Changelog](CHANGELOG.md) · [License](LICENSE) (Apache-2.0)
 
@@ -21,9 +22,9 @@ collectors — lives in `scope.toml`, which you configure per engagement.
 
 `polyfetch-scrape` is a **generic** scraping engine; its own docs put "domain API
 wrappers" out of scope and downstream. A target-specific pentest harness is exactly
-such a downstream consumer, so it lives in its own repo and **borrows** polyfetch via
-the `uv run --directory` env-borrow contract (or a git submodule). This keeps
-polyfetch generic and this repo's intent (and legal scope) clearly separated.
+such a downstream consumer, so it lives in its own repo and **consumes** polyfetch as
+an optional `browser` extra (see [polyfetch integration](docs/polyfetch-integration.md)).
+This keeps polyfetch generic and this repo's intent (and legal scope) clearly separated.
 
 ## Layout
 
