@@ -1,0 +1,22 @@
+---
+name: tag-release
+
+# Thin caller: delegates to the estate-standard reusable (qte77/.github).
+# Fires on a main push that changes pyproject.toml (typically the squash-merge of
+# a bump PR) and creates the annotated v{version} tag against that main commit.
+# The reusable is idempotent (aborts if the tag already exists) and never deletes
+# tags on failure — release immutability burns a version number forever
+# (qte77/.github#23). Upstream defaults already match this repo (version_file
+# pyproject.toml, tag_prefix v, regex `^version = "(.*)"`), so no `with:` needed.
+
+on:
+  push:
+    branches: [main]
+    paths: [pyproject.toml]
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    uses: qte77/.github/.github/workflows/tag-release.yml@b03592321e529d0d136b35852fc9045e96c65159  # 2026-07-18

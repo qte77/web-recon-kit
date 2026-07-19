@@ -1,0 +1,36 @@
+---
+name: bump-my-version
+
+# Thin caller: delegates the version bump to the estate-standard reusable
+# workflow (qte77/.github). Bumps the [tool.bumpversion] files (pyproject.toml
+# version + README version badge), syncs uv.lock, collects changelog.d/ fragments
+# into CHANGELOG.md, and opens a `chore(release)` PR. Tagging stays deferred to
+# tag-release.yaml, so the v{new} tag lands on main's squash-merge commit. The
+# opened PR is bot-authored (GITHUB_TOKEN) so its checks idle until a real-user
+# event — merge it yourself (see CONTRIBUTING "Releasing").
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: "Semver part to bump"
+        required: true
+        default: patch
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    uses: qte77/.github/.github/workflows/bump-version.yml@b03592321e529d0d136b35852fc9045e96c65159  # 2026-07-18
+    with:
+      bump_type: ${{ inputs.bump_type }}
+      use_uv: true
+      sync_lockfile: true
+      collect_scriv: true
