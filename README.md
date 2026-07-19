@@ -27,7 +27,7 @@ polyfetch generic and this repo's intent (and legal scope) clearly separated.
 
 ## Layout
 
-```
+```text
 scope.example.toml          # COMMITTED template — copy to scope.toml per engagement
 scope.toml                  # your target's base_url, identities, rate/safety, routes,
                              #   public-ok list, admin prefixes, BOLA collectors — git-ignored
