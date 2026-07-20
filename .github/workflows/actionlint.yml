@@ -43,3 +43,22 @@ jobs:
           echo "${ACTIONLINT_SHA256}  ${tarball}" | sha256sum -c -
           tar -xzf "$tarball" actionlint
           ./actionlint -color
+
+  zizmor:
+    name: zizmor
+    # GitHub Actions security scanner (injection, credential persistence, over-broad
+    # permissions, dangerous triggers). Offline + pinned: deterministic, no token needed.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor (pinned, offline)
+        env:
+          ZIZMOR_VERSION: '1.26.1'
+        run: pipx run "zizmor==${ZIZMOR_VERSION}" --offline --format github .github/workflows/
