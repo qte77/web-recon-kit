@@ -55,8 +55,10 @@ scope.toml ──┐
 
 | Knob | Where | Effect |
 |---|---|---|
-| `make <target>` | Makefile | `setup setup-browser inventory recon authmatrix cron bola bfla report all lint typecheck test audit check` |
+| `make <target>` | Makefile | `setup setup-browser inventory recon authmatrix cron bola bfla report all lint typecheck test audit check changelog_new changelog_preview changelog_release clean` |
 | `ENV=/path/.env` | make var | env file sourced for tokens |
+| `VERSION=X.Y.Z` | `make changelog_release` | version the scriv fragments are collected under |
+| `gh workflow run …` | GitHub Actions | release flow: `bump-my-version.yaml -f bump_type=major\|minor\|patch`, `publish-release.yaml -f tag=vX.Y.Z` — see [CONTRIBUTING](../CONTRIBUTING.md#releasing) |
 | `[rate].*` | scope.toml | concurrency / per-host spacing |
 | `SPEC=/path/openapi.yaml` | `r2_schemathesis.sh` | spec to fuzz (required) |
 | `MAX` / `RATE` | `r2_schemathesis.sh` | max examples / rate limit |
