@@ -25,7 +25,7 @@ collectors — lives in `scope.toml`, which you configure per engagement.
 - [Architecture](docs/architecture.md) — two tiers, components, data flow, config model, CLI/env reference
 - [polyfetch integration](docs/polyfetch-integration.md) — how the browser tier uses polyfetch-scrape
 - [Roadmap](docs/roadmap.md) · [User stories](docs/userstory.md) · [Glossary](docs/glossary.md)
-- [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Agent rules](AGENTS.md) · [License](LICENSE) (Apache-2.0)
+- [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Agent rules](AGENTS.md) · [Security](SECURITY.md) · [License](LICENSE) (Apache-2.0)
 
 ## Why standalone (not part of polyfetch-scrape)
 
