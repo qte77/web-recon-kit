@@ -958,7 +958,7 @@ wheels = [
 [[package]]
 name = "polyfetch-scrape"
 version = "0.7.0"
-source = { git = "https://github.com/qte77/polyfetch-scrape.git#ebb84fdba93a6d831e45e2cad5d7e8e94ce4368c" }
+source = { git = "https://github.com/qte77/polyfetch-scrape.git?rev=v0.7.0#e90a8e6e3a48daf02c26ca92f85a69dc979bfe52" }
 dependencies = [
     { name = "curl-cffi" },
     { name = "defusedxml" },
@@ -1259,7 +1259,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.27" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.11" },
     { name = "pip-audit", marker = "extra == 'dev'", specifier = ">=2.7" },
-    { name = "polyfetch-scrape", marker = "extra == 'browser'", git = "https://github.com/qte77/polyfetch-scrape.git" },
+    { name = "polyfetch-scrape", marker = "extra == 'browser'", git = "https://github.com/qte77/polyfetch-scrape.git?rev=v0.7.0" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8" },
     { name = "pytest-asyncio", marker = "extra == 'test'", specifier = ">=0.23" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
