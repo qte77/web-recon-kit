@@ -60,8 +60,10 @@ scope.toml ──┐
 | `VERSION=X.Y.Z` | `make changelog_release` | version the scriv fragments are collected under |
 | `gh workflow run …` | GitHub Actions | release flow: `bump-my-version.yaml -f bump_type=major\|minor\|patch`, `publish-release.yaml -f tag=vX.Y.Z` — see [CONTRIBUTING](../CONTRIBUTING.md#releasing) |
 | `[rate].*` | scope.toml | concurrency / per-host spacing |
-| `SPEC=/path/openapi.yaml` | `r2_schemathesis.sh` | spec to fuzz (required) |
-| `MAX` / `RATE` | `r2_schemathesis.sh` | max examples / rate limit |
+| `SPEC=/path/openapi.yaml` | `r2_schemathesis.sh` | spec to fuzz (**required**) |
+| `BASE_URL=https://target` | `r2_schemathesis.sh` | target origin (**required**; this runner reads env, not `scope.toml`) |
+| `RECON_API_KEY=…` | `r2_schemathesis.sh` | bearer token (**required**; or source it via `ENV=/path/.env`) |
+| `MAX` / `RATE` | `r2_schemathesis.sh` | max examples / rate limit (default `30` / `5/s`) |
 | `EXCLUDE_MUTATING=0` | `r2_schemathesis.sh` | allow mutating methods (default `1` = GET-only) |
 
 ## Safety invariants

@@ -117,6 +117,15 @@ make check        # all four
 - **BOLA (r3_bola):** needs a **second workspace** (the `tenant_b` identity) and
   `[[bola.collectors]]` entries in `scope.toml`. With one identity there is no
   other tenant to prove isolation against.
-- **schemathesis (r2_schemathesis):** needs the target's OpenAPI spec — usually
-  repo-only, not served publicly. Obtain it, then `SPEC=/path/to/openapi.yaml
-  make -f - …` or run the script directly.
+- **schemathesis (r2_schemathesis):** a standalone bash runner (not a `make` target),
+  driven by env vars rather than `scope.toml`. Needs the target's OpenAPI spec — usually
+  repo-only, not served publicly. Obtain it, then:
+
+  ```bash
+  BASE_URL=https://target.example.com RECON_API_KEY=… SPEC=/path/openapi.yaml \
+    bash runners/r2_schemathesis.sh
+  ```
+
+  `BASE_URL`, `RECON_API_KEY`, `SPEC` are required (`RECON_API_KEY` may instead be sourced
+  via `ENV=/path/.env`). Mutating methods are excluded by default; see the switch table in
+  [architecture](docs/architecture.md#cli--env-reference).
