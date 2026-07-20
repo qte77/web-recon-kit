@@ -7,11 +7,11 @@ LOADENV := set -a; . $(ENV); set +a
 
 .PHONY: setup setup-browser inventory recon authmatrix cron bola bfla report all lint typecheck test audit check changelog_new changelog_preview changelog_release clean
 
-setup:               ## install dev + test deps (ruff, mypy, pip-audit, pytest)
-	uv sync --extra dev --extra test
+setup:               ## install dev + test deps (ruff, mypy, pip-audit, pytest) — default group
+	uv sync
 
 setup-browser:       ## install the browser tier: polyfetch (from GitHub) + chromium
-	uv sync --extra dev --extra test --extra browser
+	uv sync --extra browser
 	uv run patchright install chromium
 
 inventory:           ## (re)mine the API surface from JS bundles  [needs: make setup-browser]

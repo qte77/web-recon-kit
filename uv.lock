@@ -1642,30 +1642,34 @@ dependencies = [
 browser = [
     { name = "polyfetch-scrape" },
 ]
+
+[package.dev-dependencies]
 dev = [
     { name = "bump-my-version" },
     { name = "mypy" },
     { name = "pip-audit" },
-    { name = "ruff" },
-    { name = "scriv" },
-]
-test = [
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
+    { name = "ruff" },
+    { name = "scriv" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "bump-my-version", marker = "extra == 'dev'", specifier = ">=0.29" },
     { name = "httpx", specifier = ">=0.27" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.11" },
-    { name = "pip-audit", marker = "extra == 'dev'", specifier = ">=2.7" },
     { name = "polyfetch-scrape", marker = "extra == 'browser'", git = "https://github.com/qte77/polyfetch-scrape.git?rev=v0.7.0" },
-    { name = "pytest", marker = "extra == 'test'", specifier = ">=8" },
-    { name = "pytest-asyncio", marker = "extra == 'test'", specifier = ">=0.23" },
-    { name = "pytest-cov", marker = "extra == 'test'", specifier = ">=7.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
-    { name = "scriv", extras = ["toml"], marker = "extra == 'dev'", specifier = ">=1.8" },
 ]
-provides-extras = ["dev", "test", "browser"]
+provides-extras = ["browser"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "bump-my-version", specifier = ">=0.29" },
+    { name = "mypy", specifier = ">=1.11" },
+    { name = "pip-audit", specifier = ">=2.7" },
+    { name = "pytest", specifier = ">=8" },
+    { name = "pytest-asyncio", specifier = ">=0.23" },
+    { name = "pytest-cov", specifier = ">=7.0" },
+    { name = "ruff", specifier = ">=0.6" },
+    { name = "scriv", extras = ["toml"], specifier = ">=1.8" },
+]

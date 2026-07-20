@@ -8,27 +8,29 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Later stages plug in here: `uv sync --extra dev` then `make lint typecheck audit`.
-dev = [
-    "ruff>=0.6",
-    "mypy>=1.11",
-    "pip-audit>=2.7",   # SCA: dependency vulnerability scan
-    "scriv[toml]>=1.8",  # CHANGELOG fragments (release flow)
-    "bump-my-version>=0.29",  # version bump (release flow); the bump-version reusable runs `uv run bump-my-version`
-]
-test = [
-    "pytest>=8",
-    "pytest-asyncio>=0.23",
-    "pytest-cov>=7.0",
-]
 # Browser tier (inventory mining, gate classification, screenshots). Pulls polyfetch and its
-# heavy deps (patchright, curl_cffi) — kept OPTIONAL so the API tier stays httpx-only.
+# heavy deps (patchright, curl_cffi) — kept an OPTIONAL extra so the API tier stays httpx-only.
 # After `uv sync --extra browser`, run `uv run patchright install chromium` once.
 browser = [
     # Pinned to a release tag so browser-tier installs are reproducible; an unpinned git
     # dep silently tracks polyfetch's default branch. uv.lock records the exact commit.
     # Bump this tag deliberately when adopting a new polyfetch release.
     "polyfetch-scrape @ git+https://github.com/qte77/polyfetch-scrape.git@v0.7.0",
+]
+
+# Dev + test tooling as a PEP 735 dependency-group (NOT an optional-dependencies extra), so
+# `uv sync` and `uv run` install it BY DEFAULT. The release reusable runs `uv run
+# bump-my-version` / `uv run scriv` with no `--extra`, so those tools must be default-synced.
+[dependency-groups]
+dev = [
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "pip-audit>=2.7",         # SCA: dependency vulnerability scan
+    "scriv[toml]>=1.8",       # CHANGELOG fragments (release flow)
+    "bump-my-version>=0.29",  # version bump (release flow)
+    "pytest>=8",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=7.0",        # coverage gate
 ]
 
 [tool.uv]
