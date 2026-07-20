@@ -23,7 +23,10 @@ test = [
 # heavy deps (patchright, curl_cffi) — kept OPTIONAL so the API tier stays httpx-only.
 # After `uv sync --extra browser`, run `uv run patchright install chromium` once.
 browser = [
-    "polyfetch-scrape @ git+https://github.com/qte77/polyfetch-scrape.git",
+    # Pinned to a release tag so browser-tier installs are reproducible; an unpinned git
+    # dep silently tracks polyfetch's default branch. uv.lock records the exact commit.
+    # Bump this tag deliberately when adopting a new polyfetch release.
+    "polyfetch-scrape @ git+https://github.com/qte77/polyfetch-scrape.git@v0.7.0",
 ]
 
 [tool.uv]
