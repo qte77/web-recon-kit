@@ -10,6 +10,9 @@ inventory/api_endpoints.json
 # results (may contain workspace data)
 results/
 
+# local agent scratch memory — machine-specific notes, never shared
+MEMORY.md
+
 # python
 .venv/
 __pycache__/
