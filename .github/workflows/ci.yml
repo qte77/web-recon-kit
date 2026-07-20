@@ -22,7 +22,7 @@ jobs:
       - uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990  # v8.3.2
         with:
           enable-cache: true
-      - run: uv sync --frozen --extra dev --extra test
+      - run: uv sync --frozen
       - run: uv run ruff check .
       - run: uv run mypy
       - run: uv run pytest --cov
@@ -36,7 +36,7 @@ jobs:
       - uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990  # v8.3.2
         with:
           enable-cache: true
-      - run: uv sync --frozen --extra dev
+      - run: uv sync --frozen
       - run: uv run pip-audit
 
   secret-scan:
