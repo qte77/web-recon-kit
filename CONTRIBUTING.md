@@ -1,7 +1,7 @@
 # Contributing
 
-Behavioural rules for AI agents live in the workspace `.claude/rules/` (loaded via
-`CLAUDE.md`). This file covers the human contributor workflow.
+This file is the contributor contract for **humans and AI agents alike**. Agents should
+read it first, then [AGENTS.md](AGENTS.md) for the extra guardrails that apply to them.
 
 ## Documentation hierarchy
 
@@ -11,7 +11,8 @@ One audience per file — reference, don't duplicate (estate contract:
 | File | Audience | Owns |
 | --- | --- | --- |
 | [README.md](README.md) | users / evaluators | what this is, why, how — the front door |
-| CONTRIBUTING.md (this file) | contributors | workflow, commands, conventions, releasing |
+| CONTRIBUTING.md (this file) | contributors + agents | workflow, commands, conventions, releasing |
+| [AGENTS.md](AGENTS.md) | AI agents | guardrails and evidence rules on top of this file |
 | [docs/](docs/) | users / operators | architecture, roadmap, glossary, polyfetch integration |
 | [CHANGELOG.md](CHANGELOG.md) | everyone | notable changes by version |
 
@@ -25,14 +26,36 @@ markdownlint $(git ls-files '*.md')
 lychee --offline $(git ls-files '*.md')
 ```
 
+## Testing
+
+- **TDD** — model the expected and desired behaviour first, then implement.
+- **Only non-trivial tests.** Test behavioural contracts: defaults that decide what gets
+  probed, documented invariants (`get()` "never raises"), auth guarantees. Never write a
+  test to move a coverage number.
+- **Test modules, not scripts.** `lib/` is the shared module and carries the 80% coverage
+  gate. `runners/`, `inventory/` and `report.py` are thin CLI scripts and sit outside the
+  coverage scope on purpose.
+- Tests must not touch the network — use `httpx.MockTransport`.
+
+## Code conventions
+
+- **No `make` targets in source.** Module docstrings and comments show the direct command
+  (`uv run python runners/r1_recon.py`, `uv sync --extra browser`); the Makefile is a
+  convenience layer, so source must stand on its own.
+- Strict lint, strict typing and dependency auditing are always-on — `make check` must be
+  clean before pushing. Fix the change rather than relaxing a gate.
+
 ## Conventional Commits
 
-`feat`, `fix`, `docs`, `chore`, `refactor`. Optional scope: `feat(SCOPE): ...`. PR titles match.
+`feat`, `fix`, `docs`, `chore`, `refactor`, `test`. Optional scope: `feat(SCOPE): ...`.
+PR titles match.
 
 ## Branches
 
-- `feat/TOPIC`, `fix/TOPIC`, `docs/TOPIC`, `chore/TOPIC`
-- Squash-merge is default. Force-push only with `--force-with-lease`, never to `main`.
+- `feat/TOPIC`, `fix/TOPIC`, `docs/TOPIC`, `chore/TOPIC`, `test/TOPIC`
+- **One topic per branch and per commit.**
+- Squash-merge only once **every** CI check passes; then delete the branch, local and
+  remote. Force-push only with `--force-with-lease`, never to `main`.
 
 ## CHANGELOG
 

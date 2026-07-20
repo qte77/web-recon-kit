@@ -14,9 +14,16 @@ Delivery history + direction. Open work is tracked as GitHub issues.
 - Coverage gate (80%) over `lib/`, the shared module. The runners and `report.py` are
   thin CLI scripts and stay out of scope rather than inviting box-ticking tests.
 
+- `qte77/.github` reusable `lint-md-links` + an **actionlint** gate on
+  `.github/workflows/**`.
+- Release pipeline matching sibling repos: `bump-my-version` + scriv fragments →
+  `tag-release` → `publish-release`, as thin callers into the `qte77/.github` reusables.
+  First release: `v0.1.0`.
+- `uv.lock` enforced in CI via `uv sync --frozen`, so the lockfile cannot drift from
+  `pyproject.toml` unnoticed.
+
 ## Direction
 
-- Adopt `qte77/.github` reusable workflows (`lint-md-links`, `validate`) + an
-  **actionlint** gate on `.github/workflows/**`.
-- Release pipeline (bump-my-version + scriv → tag-release), matching sibling repos.
 - More BOLA collector patterns; a schemathesis wrapper that discovers the spec.
+- Exercise the browser tier in CI so polyfetch API breakage is caught early ([#13](https://github.com/qte77/web-recon-kit/issues/13)).
+- Standardize `uv.lock` enforcement across the estate ([qte77/.github#37](https://github.com/qte77/.github/issues/37)).

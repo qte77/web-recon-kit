@@ -25,7 +25,7 @@ collectors — lives in `scope.toml`, which you configure per engagement.
 - [Architecture](docs/architecture.md) — two tiers, components, data flow, config model, CLI/env reference
 - [polyfetch integration](docs/polyfetch-integration.md) — how the browser tier uses polyfetch-scrape
 - [Roadmap](docs/roadmap.md) · [User stories](docs/userstory.md) · [Glossary](docs/glossary.md)
-- [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [License](LICENSE) (Apache-2.0)
+- [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Agent rules](AGENTS.md) · [License](LICENSE) (Apache-2.0)
 
 ## Why standalone (not part of polyfetch-scrape)
 
@@ -100,13 +100,16 @@ Override the env-file location: `make authmatrix ENV=/path/to/.env`.
   `workflow/verify_findings.workflow.js` fans out `parallel()` verifier panels per
   candidate finding (pass candidates via `args`; Workflow scripts can't read files).
 
-## Quality gates (wired now, for later stages)
+## Quality gates
+
+All four run in CI on every PR:
 
 ```bash
 make lint         # ruff  (E,F,I,B,UP,ANN,S,RUF,PTH)
 make typecheck    # mypy --strict
+make test         # pytest + coverage gate (80% over lib/, see pyproject.toml)
 make audit        # pip-audit (SCA)
-make check        # all three
+make check        # all four
 ```
 
 ## Category-2/3 prerequisites
