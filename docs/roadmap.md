@@ -11,6 +11,8 @@ Delivery history + direction. Open work is tracked as GitHub issues.
   SHA-pinned actions. Extracted from `qte77/__kavanah_analysis` (first real engagement).
 - `polyfetch-scrape` pinned to a release tag (`@v0.7.0`) for reproducible browser-tier
   installs — a tag plus the `uv.lock`-recorded commit, rather than a git submodule.
+- Coverage gate (80%) over `lib/`, the shared module. The runners and `report.py` are
+  thin CLI scripts and stay out of scope rather than inviting box-ticking tests.
 
 ## Direction
 
@@ -18,4 +20,3 @@ Delivery history + direction. Open work is tracked as GitHub issues.
   **actionlint** gate on `.github/workflows/**`.
 - Release pipeline (bump-my-version + scriv → tag-release), matching sibling repos.
 - More BOLA collector patterns; a schemathesis wrapper that discovers the spec.
-- Coverage gate on the test suite.

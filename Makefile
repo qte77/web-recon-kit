@@ -46,8 +46,8 @@ typecheck:           ## mypy --strict
 audit:               ## SCA: dependency vulnerability scan
 	uv run pip-audit
 
-test:                ## pytest smoke tests
-	uv run pytest
+test:                ## pytest + coverage gate (fail_under in pyproject.toml)
+	uv run pytest --cov
 
 check: lint typecheck test audit
 

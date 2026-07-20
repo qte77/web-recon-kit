@@ -25,7 +25,7 @@ jobs:
       - run: uv sync --frozen --extra dev --extra test
       - run: uv run ruff check .
       - run: uv run mypy
-      - run: uv run pytest
+      - run: uv run pytest --cov
   audit:
     runs-on: ubuntu-latest
     timeout-minutes: 10
