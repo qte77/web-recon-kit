@@ -23,7 +23,7 @@ browser = [
 # bump-my-version` / `uv run scriv` with no `--extra`, so those tools must be default-synced.
 [dependency-groups]
 dev = [
-    "ruff>=0.6",
+    "ruff>=0.16.0",
     "mypy>=1.11",
     "pip-audit>=2.7",         # SCA: dependency vulnerability scan
     "scriv[toml]>=1.8",       # CHANGELOG fragments (release flow)
