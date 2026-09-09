@@ -4,10 +4,10 @@
 the exploration behind it is already done (see "Source map & verified facts" at the end) —
 do not re-explore the codebase or re-run the GitHub audits before acting.
 
-**Status:** this plan document is landing in the PR that adds it
-(`docs/plans/0001-housekeeping-and-issue-backlog.md`, row 5 below — see "Sequencing"). It is
-a handoff artifact for the next session (or the repo owner) to resume from — **not** a signal
-to auto-continue: execution of the rest of the arc (rows 1-16) is **paused pending an
+**Status:** this plan document landed via
+[PR #36](https://github.com/qte77/web-recon-kit/pull/36) (row 5 below — see "Sequencing").
+It is a handoff artifact for the next session (or the repo owner) to resume from — **not** a
+signal to auto-continue: execution of the rest of the arc (rows 1-16) is **paused pending an
 explicit go-ahead from the repo owner**. Every row below gets struck with its PR number in
 the SAME PR that ships it; re-read this file's remaining-work table for current status
 before resuming.
@@ -131,7 +131,7 @@ conflicts expected; recipe: keep both sides). lib/types.py: A2/A3 vs B3 — diff
 | 2 | Read #32's audit log first; if its own bumps introduce a vulnerable pin, fold them into slice 0's `--upgrade-package` list and close #32 as superseded too; else proceed as planned. Slice 0 `chore(deps): fix pip-audit findings (pip 26.2, httpx2 2.12, httpcore2 2.10)` | 0 | agent | local gate incl. `pip-audit` clean; PR all checks green; merged; latest main CI green incl. audit |
 | 3 | Close #33/#34/#35 (and #32 if folded) as superseded (if Dependabot has not) with "superseded by #<2>" | 0 | agent | `gh pr list --author app/dependabot` shows only #32 (or none, if folded) |
 | 4 | If #32 not folded into slice 0: `@dependabot rebase` #32 → all checks green → squash-merge | 0 | agent | merged; no open dependabot PRs |
-| 5 | `docs(plan): add arc 0001` — `docs/plans/0001-housekeeping-and-issue-backlog.md` (this plan, repo form) + roadmap link | 0 | agent | merged as PR #<PR_NUMBER> (this PR) |
+| 5 | `docs(plan): add arc 0001` — `docs/plans/0001-housekeeping-and-issue-backlog.md` (this plan, repo form) + roadmap link | 0 | agent | merged as [PR #36](https://github.com/qte77/web-recon-kit/pull/36) |
 | 6 | `chore(dependabot): group security + version updates; create labels` (+ `gh label create dependencies/python/github-actions`) | 0 | agent | schema-valid; merged; labels exist |
 | 7 | Verify grouping: next Dependabot security/weekly run opens grouped, labeled PRs | 0 | data | one grouped `python-security`/`python-deps` PR carrying labels observed |
 | 8 | Open follow-up issue: runner-local `ROOT`s + `load_endpoints`/`write_jsonl` make multi-target runs share `results/`/`inventory/` (out of #29 scope) | 0 | agent | issue exists, linked from #29's PR body |
