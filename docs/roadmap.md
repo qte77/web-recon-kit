@@ -27,3 +27,4 @@ Delivery history + direction. Open work is tracked as GitHub issues.
 - More BOLA collector patterns; a schemathesis wrapper that discovers the spec ([#17](https://github.com/qte77/web-recon-kit/issues/17)).
 - Exercise the browser tier in CI so polyfetch API breakage is caught early ([#13](https://github.com/qte77/web-recon-kit/issues/13)).
 - Standardize `uv.lock` enforcement across the estate ([qte77/.github#37](https://github.com/qte77/.github/issues/37)).
+- Housekeeping + prioritized issue backlog arc: see [docs/plans/0001-housekeeping-and-issue-backlog.md](plans/0001-housekeeping-and-issue-backlog.md).
