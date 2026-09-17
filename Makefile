@@ -1,7 +1,7 @@
 # web-recon-kit — reusable, target-agnostic web/API assessment harness.
 # API tier (auth-matrix, cron, BOLA, BFLA, report) needs only httpx.
 # Browser tier (inventory, recon) needs the optional `browser` extra (polyfetch + chromium).
-ENV ?= .env
+ENV ?= ./.env
 PY  := uv run python
 LOADENV := set -a; . $(ENV); set +a
 
