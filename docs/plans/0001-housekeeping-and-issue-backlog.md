@@ -39,24 +39,21 @@ whitelist) — new row 8b. [PR #37](https://github.com/qte77/web-recon-kit/pull/
 Claude-assisted, unrelated `Makefile` `.env` path-lookup fix) also merged during the gap —
 independently verified sound, no action needed, not part of this arc's scope.
 
-**Needs an explicit owner decision before Lane A proceeds — discovered 2026-09-18, missed
-when this plan was first written:** #29 and #30 (originally rows 9-10) are authored by a
-different GitHub user ("dntywntme"), **not qte77**. This arc was scoped to the repo owner's
-own backlog; the original analysis treated all 7 issues as one undifferentiated set without
-checking authorship. Implementing another contributor's feature request under an
-owner-directed unattended arc is a different call than executing the owner's own backlog —
-rows 9-10 are marked `owner`-gated pending that decision (options: implement as specced
-anyway, ask the contributor for more detail first, or leave for them to PR themselves). #17
-(row 11) is unaffected — it IS qte77's own issue.
+**Owner decision recorded 2026-09-18 — #29/#30/#31 accepted:** #29, #30, and #31 (rows 9,
+10, 13) are authored by a different GitHub user ("dntywntme"), not qte77 — missed when this
+plan was first written (all 7 issues were treated as one undifferentiated set without
+checking authorship; #31 itself was missed in the first authorship-correction pass and
+caught only on a second check). Flagged to the owner as a distinct decision (implementing a
+contributor's feature request is a different call than executing the owner's own backlog);
+**the owner explicitly accepted all three for implementation**, so rows 9, 10, 13 are back
+to `agent`-gated, unblocked, same specs as originally written — no re-design needed.
 
-**Next action, in order:** rows 1-8b are now all DONE (this session closed out rows 8 and 8b
-too — issue #41 opened, #38 fixed via PR #40). Remaining: (1) owner decides rows 9-10
-(#29/#30 authorship — see above); (2) rows 11-15 (Lane A's #17, Lane B, Lane C1) — still
-valid as specced, still need the worktree-git blocker resolved (see below) or the
-coordinator doing each lane's git operations directly, as was done for rows 1/4/6/8/8b this
-session; (3) row 16 stays owner-gated; (4) row 7 (data gate) resolves itself whenever
-Dependabot's next run fires. Full order and dependencies: "Sequencing" + "Remaining-work
-table" below.
+**Next action, in order:** rows 1-8b are DONE. Rows 9, 10, 11, 12, 13, 14, 15 are all
+`agent`-gated and unblocked (#29/#30/#31 accepted; #17/#21/#13 were never blocked) — still
+need the worktree-git blocker resolved (see below) or the coordinator doing each lane's git
+operations directly, as was done for rows 1/4/6/8/8b this session. Row 16 stays owner-gated
+(needs a real target). Row 7 (data gate) resolves itself whenever Dependabot's next run
+fires. Full order and dependencies: "Sequencing" + "Remaining-work table" below.
 
 **The loop (parallel subagents in worktrees — yes, this plan is set up for that):** the
 coordinator launches one **fresh `general-purpose` agent per lane** (Lane 0, A, B, C) with
@@ -177,11 +174,11 @@ conflicts expected; recipe: keep both sides). lib/types.py: A2/A3 vs B3 — diff
 | 7 | Verify grouping: next Dependabot security/weekly run opens grouped, labeled PRs | 0 | data | still open — no Dependabot run has fired against the new config yet; observe and record here |
 | 8 | Open follow-up issue: runner-local `ROOT`s + `load_endpoints`/`write_jsonl` make multi-target runs share `results/`/`inventory/` (independent of #29, which hasn't shipped) | 0 | agent | DONE — opened as [issue #41](https://github.com/qte77/web-recon-kit/issues/41) |
 | 8b | #38 (qte77, real bug from a live engagement) — `report.py` doesn't apply `scope.toml`'s `public_ok` whitelist, so whitelisted paths show as false-positive findings | 0 | agent | DONE — merged as [PR #40](https://github.com/qte77/web-recon-kit/pull/40); verified with an isolated in-process dry run (no `lib/`-level test — this is thin-script wiring, not module logic) |
-| 9 | A1 · #29 `feat(scope): RECON_SCOPE selects the scope file` | A | **owner** | **BLOCKED — #29 is authored by "dntywntme", not qte77** (found 2026-09-18). Owner decides: implement as specced, ask for more detail, or leave for the contributor to PR |
-| 10 | A2 · #30 `feat(inventory): configurable path_prefixes for bundle mining` | A | **owner** | **BLOCKED — same authorship issue as row 9** (#30 also by "dntywntme") |
+| 9 | A1 · #29 `feat(scope): RECON_SCOPE selects the scope file` | A | agent | authored by "dntywntme", not qte77 — **owner accepted 2026-09-18**, unblocked; tests RED→GREEN; gate + CI green; merged; `Closes #29` |
+| 10 | A2 · #30 `feat(inventory): configurable path_prefixes for bundle mining` | A | agent | authored by "dntywntme" — **owner accepted 2026-09-18**, unblocked; tests RED→GREEN; gate + CI green; merged; `Closes #30` |
 | 11 | A3 · #17 `feat(bola): dotted collection_key and configurable id_field` | A | agent | still valid (qte77's own issue) — tests RED→GREEN; gate + CI green; merged; `Refs #17` + comment |
 | 12 | B1 · #21-1 `feat(recon): record per-route console_errors in recon.jsonl` | B | agent | gate + CI green; merged; `Refs #21` |
-| 13 | B2 · #31 `fix(browser): guard the polyfetch import with an actionable exit-2 hint` | B | agent | tests RED→GREEN; local proof (exit 2 + hint) quoted; merged; `Refs #31` + comment |
+| 13 | B2 · #31 `fix(browser): guard the polyfetch import with an actionable exit-2 hint` | B | agent | authored by "dntywntme" — **owner accepted 2026-09-18**, unblocked; tests RED→GREEN; local proof (exit 2 + hint) quoted; merged; `Refs #31` + comment |
 | 14 | B3 · #21-2 `feat(recon): audit Set-Cookie security flags per route` | B | agent | tests RED→GREEN; lib cov ≥ 80 %; merged; `Refs #21` + comment |
 | 15 | C1 · #13 `ci: browser-tier import smoke for the polyfetch extra` | C | agent | job runs green on its own PR + actionlint/zizmor green; merged; `gh workflow run` green; `Closes #13` |
 | 16 | Browser-tier e2e of B1/B3 against an authorized target (needs `scope.toml`, glibc host, `uv sync --extra browser`) | B | owner | owner runs `uv run python runners/r1_recon.py`; rows show `console_errors`/`cookie_findings` |
