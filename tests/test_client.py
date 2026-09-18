@@ -16,6 +16,7 @@ from lib.client import (
     get,
     get_json,
     identities,
+    inventory_prefixes,
     load_scope,
     public_ok,
     recon_routes,
@@ -77,12 +78,13 @@ async def test_throttle_spaces_requests() -> None:
 
 
 def test_scope_accessors_fall_back_to_documented_defaults() -> None:
-    scope = _scope()  # deliberately has no [recon]/[authmatrix]/[bfla]/[bola]
+    scope = _scope()  # deliberately has no [recon]/[authmatrix]/[bfla]/[bola]/[inventory]
     assert recon_routes(scope) == ["/"]
     assert cron_prefix(scope) == "/api/cron/"
     assert public_ok(scope) == frozenset()
     assert admin_prefixes(scope) == ("/api/admin/",)
     assert bola_collectors(scope) == []
+    assert inventory_prefixes(scope) == ("/api/",)
 
 
 def test_scope_accessors_honour_explicit_configuration() -> None:
@@ -91,12 +93,14 @@ def test_scope_accessors_honour_explicit_configuration() -> None:
     scope["authmatrix"] = {"public_ok": ["/api/health", "/api/health"]}
     scope["bfla"] = {"admin_prefixes": ["/api/root/", "/api/staff/"]}
     scope["bola"] = {"collectors": [{"list": "/api/items", "by_id": "/api/items/{id}"}]}
+    scope["inventory"] = {"path_prefixes": ["/api/", "/v1/"]}
 
     assert recon_routes(scope) == ["/app", "/login"]
     assert cron_prefix(scope) == "/api/jobs/"
     assert public_ok(scope) == frozenset({"/api/health"})  # de-duplicated
     assert admin_prefixes(scope) == ("/api/root/", "/api/staff/")
     assert len(bola_collectors(scope)) == 1
+    assert inventory_prefixes(scope) == ("/api/", "/v1/")
 
 
 # --- GET invariants -----------------------------------------------------------

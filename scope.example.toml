@@ -50,6 +50,11 @@ public_ok = []
 # ["/api/admin/"] if omitted.
 admin_prefixes = ["/api/admin/"]
 
+[inventory]
+# Literal path prefixes the bundle miner harvests from JS. Keep the trailing
+# slash so "/claim" doesn't match "/claimant". Defaults to ["/api/"] if omitted.
+path_prefixes = ["/api/"]
+
 # [bola]
 # Collectors r3_bola uses to harvest resource IDs (as `owner`) and then probe
 # them (as `tenant_b`) for cross-tenant leaks. Each collector needs:

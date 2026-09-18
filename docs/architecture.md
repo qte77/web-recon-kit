@@ -21,9 +21,10 @@ use polyfetch (bundle mining, gate classification, screenshots).
 ## Components
 
 - `lib/` — typed core (mypy `--strict`): `client.py` (throttled async httpx, identity
-  resolution, scope accessors), `types.py` (TypedDict schemas).
-- `inventory/build_inventory.py` — mines `/api/*` endpoints from the target's JS
-  bundles → `inventory/api_endpoints.json`.
+  resolution, scope accessors), `types.py` (TypedDict schemas), `inventory.py`
+  (JS-bundle path-mining, pure).
+- `inventory/build_inventory.py` — mines endpoints under `[inventory].path_prefixes`
+  (default `/api/`) from the target's JS bundles → `inventory/api_endpoints.json`.
 - `runners/` — one file per check; all read-only (GET/OPTIONS), throttled, config-driven.
 - `report.py` — aggregates `results/*.jsonl` → `results/report.md`.
 - `workflow/verify_findings.workflow.js` — agentic adversarial verification (fan-out
@@ -50,6 +51,7 @@ scope.toml ──┐
 | `[authmatrix]` `public_ok` | endpoints where an unauthenticated 200 is expected, not a finding |
 | `[bfla]` `admin_prefixes` | admin/RBAC path prefixes for r3_rbac_bfla |
 | `[[bola.collectors]]` | list-endpoint → by-id probe templates for r3_bola |
+| `[inventory]` `path_prefixes` | literal path prefixes mined from JS bundles (default `["/api/"]`) |
 
 ## CLI / env reference
 
