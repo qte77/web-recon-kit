@@ -65,8 +65,12 @@ make recon            # gate classification + screenshots -> results/recon.jsonl
 ```
 
 Once `make setup-browser` has installed the extra into the project's own venv, the runners
-resolve `import polyfetch_scrape` normally — no path plumbing. CI never installs the
-`browser` extra (API-tier gates only), so the polyfetch import is exercised locally.
+resolve `import polyfetch_scrape` normally — no path plumbing. The main PR gate (`ci.yml`)
+never installs the `browser` extra; a separate, paths-filtered `browser-tier.yml` workflow
+does an import-only smoke test of the extra and both browser-tier runners — triggered only
+when `pyproject.toml`, `uv.lock`, or those two runners change, plus weekly — so polyfetch API
+breakage is caught before an engagement without slowing the normal PR path down with a
+Chromium download on every push.
 The import itself goes through `lib.browser.require_render_session()`: on musllinux (e.g.
 Alpine), or simply before `make setup-browser` has run, both browser-tier runners exit 2
 with an actionable hint (install command + the musllinux caveat) instead of a raw

@@ -1,0 +1,48 @@
+---
+name: Browser tier
+on:
+  push:
+    branches: [main]
+    paths:
+      - pyproject.toml
+      - uv.lock
+      - runners/r1_recon.py
+      - inventory/build_inventory.py
+      - .github/workflows/browser-tier.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - pyproject.toml
+      - uv.lock
+      - runners/r1_recon.py
+      - inventory/build_inventory.py
+      - .github/workflows/browser-tier.yml
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: browser-tier-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  import-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4  # v10.1.0
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --extra browser
+      - name: Import polyfetch entry point + both browser-tier runners
+        run: |
+          uv run python - <<'EOF'
+          import inspect
+          from polyfetch_scrape import render_session
+          import inventory.build_inventory, runners.r1_recon
+          print("render_session", inspect.signature(render_session))
+          EOF
