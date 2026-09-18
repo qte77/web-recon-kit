@@ -18,10 +18,14 @@ and drive headless Chromium through the `session.page` handle it yields:
 - **`runners/r1_recon.py` — gate classification + screenshots.** Renders each route in
   `[recon].routes`, watches the document response, follows client-side redirects, records
   each route's `console_errors` (error-level console messages + uncaught page errors,
-  sliced from polyfetch's accumulating session capture), and writes a full-page screenshot
-  per route to `results/screens/`. **Vantage-scoped**: this reflects only the runner's own
-  headless network — a CORS/extension/proxy failure a real user's browser hits can read
-  clean here.
+  sliced from polyfetch's accumulating session capture) and `cookie_findings` (per-cookie
+  security-flag audit — missing `HttpOnly`/`Secure`, or `SameSite=None`/unset — read from
+  the document response's `Set-Cookie` headers, **never `page.evaluate`**: patchright's
+  isolated worlds make in-page cookie reads unreliable, and headers are the only vantage
+  that also matches what a real browser actually enforces), and writes a full-page
+  screenshot per route to `results/screens/`. **Vantage-scoped**: both signals reflect only
+  the runner's own headless network — a CORS/extension/proxy failure, or a cookie set by a
+  later in-page fetch, a real user's browser hits can read clean here.
 
 ### Gate classification
 

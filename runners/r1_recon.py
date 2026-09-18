@@ -18,6 +18,8 @@ sys.path.insert(0, str(ROOT))
 
 from lib.browser import require_render_session  # noqa: E402
 from lib.client import load_scope, recon_routes  # noqa: E402
+from lib.cookies import audit_set_cookie  # noqa: E402
+from lib.types import CookieFinding  # noqa: E402
 
 render_session = require_render_session()
 
@@ -29,6 +31,7 @@ class ReconRow(TypedDict):
     gate: str
     title: str
     console_errors: list[str]
+    cookie_findings: list[CookieFinding]
 
 
 def classify(route: str, doc_http: int | None, final_url: str) -> str:
@@ -52,13 +55,21 @@ def main() -> None:
         page = session.page
         for route in routes:
             doc_status: dict[str, int | None] = {"code": None}
+            set_cookie_headers: list[str] = []
 
             def on_resp(
                 resp: object, route: str = route, ds: dict[str, int | None] = doc_status,
+                sc: list[str] = set_cookie_headers,
             ) -> None:
                 url = cast(str, getattr(resp, "url", ""))
                 if url.rstrip("/") == (base + route).rstrip("/"):
                     ds["code"] = cast(int, getattr(resp, "status", None))
+                req = getattr(resp, "request", None)
+                is_document = getattr(req, "resource_type", "") == "document"
+                header_values = getattr(resp, "header_values", None)
+                if is_document and url.startswith(base) and header_values is not None:
+                    with contextlib.suppress(Exception):
+                        sc.extend(cast("list[str]", header_values("set-cookie")))
 
             page.on("response", on_resp)
             mark = len(session.console_errors)
@@ -66,6 +77,7 @@ def main() -> None:
                 page.goto(base + route, wait_until="domcontentloaded", timeout=25000)
             page.wait_for_timeout(2500)
             console_errors = list(session.console_errors[mark:])
+            cookie_findings = audit_set_cookie(set_cookie_headers)
             final_url = cast(str, page.url).replace(base, "") or "/"
             title = cast(str, page.title() or "")[:80]
             slug = route.strip("/").replace("/", "_") or "root"
@@ -74,9 +86,9 @@ def main() -> None:
             gate = classify(route, doc_status["code"], final_url)
             rows.append({"route": route, "doc_http": doc_status["code"],
                          "final_url": final_url, "gate": gate, "title": title,
-                         "console_errors": console_errors})
+                         "console_errors": console_errors, "cookie_findings": cookie_findings})
             print(f"  {route:<16} doc={doc_status['code']} -> {final_url:<28} "
-                  f"[{gate}] errs={len(console_errors)}")
+                  f"[{gate}] errs={len(console_errors)} weak-cookies={len(cookie_findings)}")
             page.remove_listener("response", on_resp)
 
     out = ROOT / "results" / "recon.jsonl"
