@@ -16,9 +16,10 @@ from typing import TypedDict, cast
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from polyfetch_scrape import render_session  # noqa: E402
-
+from lib.browser import require_render_session  # noqa: E402
 from lib.client import load_scope, recon_routes  # noqa: E402
+
+render_session = require_render_session()
 
 
 class ReconRow(TypedDict):

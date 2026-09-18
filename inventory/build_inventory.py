@@ -17,11 +17,12 @@ from typing import cast
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from polyfetch_scrape import render_session  # noqa: E402
-
+from lib.browser import require_render_session  # noqa: E402
 from lib.client import inventory_prefixes, load_scope, target_host  # noqa: E402
 from lib.inventory import harvest_paths  # noqa: E402
 from lib.types import Endpoint  # noqa: E402
+
+render_session = require_render_session()
 
 
 def _harvest_js(host: str) -> str:

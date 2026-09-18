@@ -63,5 +63,9 @@ make recon            # gate classification + screenshots -> results/recon.jsonl
 Once `make setup-browser` has installed the extra into the project's own venv, the runners
 resolve `import polyfetch_scrape` normally — no path plumbing. CI never installs the
 `browser` extra (API-tier gates only), so the polyfetch import is exercised locally.
+The import itself goes through `lib.browser.require_render_session()`: on musllinux (e.g.
+Alpine), or simply before `make setup-browser` has run, both browser-tier runners exit 2
+with an actionable hint (install command + the musllinux caveat) instead of a raw
+`ImportError` — run on a glibc host, or install the extra, and re-run.
 
 [poly]: https://github.com/qte77/polyfetch-scrape
