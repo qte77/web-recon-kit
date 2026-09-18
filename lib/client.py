@@ -1,6 +1,7 @@
 """Shared config + throttled async HTTP client (mypy --strict clean).
 
 Only httpx (PEP 561-typed) + stdlib. Read-only GET/OPTIONS by design.
+Scope file: scope.toml at the repo root, or $RECON_SCOPE (relative to cwd).
 """
 from __future__ import annotations
 
@@ -19,10 +20,23 @@ import httpx
 from lib.types import BolaCollector, GetResult, ResolvedIdentity, Scope
 
 ROOT: Path = Path(__file__).resolve().parent.parent
+SCOPE_ENV = "RECON_SCOPE"
+
+
+def scope_path() -> Path:
+    """$RECON_SCOPE (relative to the caller's cwd) or <repo>/scope.toml."""
+    override = os.environ.get(SCOPE_ENV)
+    return Path(override) if override else ROOT / "scope.toml"
 
 
 def load_scope() -> Scope:
-    with (ROOT / "scope.toml").open("rb") as f:
+    path = scope_path()
+    if not path.is_file():
+        raise FileNotFoundError(
+            f"scope file not found: {path.resolve()} — set {SCOPE_ENV} to a scope TOML "
+            "or copy scope.example.toml to scope.toml"
+        )
+    with path.open("rb") as f:
         return cast(Scope, tomllib.load(f))
 
 

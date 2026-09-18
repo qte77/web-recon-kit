@@ -1,11 +1,13 @@
 """Smoke tests for the assessment harness core (lib.client, runners.r2_cron_auth)."""
 import time
 from collections.abc import Callable
+from pathlib import Path
 
 import httpx
 import pytest
 
 from lib.client import (
+    ROOT,
     Throttle,
     _headers,
     admin_prefixes,
@@ -14,8 +16,10 @@ from lib.client import (
     get,
     get_json,
     identities,
+    load_scope,
     public_ok,
     recon_routes,
+    scope_path,
 )
 from lib.types import Scope
 from runners.r2_cron_auth import classify
@@ -166,3 +170,60 @@ async def test_get_json_captures_transport_error_instead_of_raising() -> None:
 
     assert status is None
     assert data is None
+
+
+# --- RECON_SCOPE override -------------------------------------------------------
+# `scope_path()`/`load_scope()` must default to the repo's own scope.toml, but let
+# RECON_SCOPE point at any other file (relative to the caller's cwd) for multi-target use.
+
+_MINIMAL_TOML = (
+    'base_url = "https://alt.example.test"\n'
+    "[identities.owner]\n"
+    'env = "ALT_TOKEN"\n'
+    'role = "owner"\n'
+    'workspace = "A"\n'
+    "[rate]\n"
+    "max_concurrency = 1\n"
+    "per_host_delay_ms = 0\n"
+    "[safety]\n"
+    'methods = ["GET"]\n'
+)
+
+
+@pytest.mark.parametrize("value", [None, ""])
+def test_scope_path_defaults_to_repo_scope_toml(
+    monkeypatch: pytest.MonkeyPatch, value: str | None
+) -> None:
+    if value is None:
+        monkeypatch.delenv("RECON_SCOPE", raising=False)
+    else:
+        monkeypatch.setenv("RECON_SCOPE", value)
+    assert scope_path() == ROOT / "scope.toml"
+
+
+def test_load_scope_honours_recon_scope_override_absolute(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    alt = tmp_path / "alt.toml"
+    alt.write_text(_MINIMAL_TOML)
+    monkeypatch.setenv("RECON_SCOPE", str(alt))
+    assert load_scope()["base_url"] == "https://alt.example.test"
+
+
+def test_load_scope_honours_recon_scope_override_relative(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    (tmp_path / "alt.toml").write_text(_MINIMAL_TOML)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("RECON_SCOPE", "alt.toml")
+    assert load_scope()["base_url"] == "https://alt.example.test"
+
+
+def test_load_scope_missing_file_fails_with_resolved_path(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    missing = tmp_path / "nope.toml"
+    monkeypatch.setenv("RECON_SCOPE", str(missing))
+    with pytest.raises(FileNotFoundError) as excinfo:
+        load_scope()
+    assert str(missing.resolve()) in str(excinfo.value)

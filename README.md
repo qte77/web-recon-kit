@@ -91,6 +91,9 @@ make all              # authmatrix + cron + bola + bfla + report
 ```
 
 Override the env-file location: `make authmatrix ENV=/path/to/.env`.
+Point any runner at a different scope file: `RECON_SCOPE=scope.acme.toml make authmatrix`
+(relative to your shell cwd; default `scope.toml`). See
+[CLI / env reference](docs/architecture.md#cli--env-reference).
 
 ## Fork / bulk model
 
