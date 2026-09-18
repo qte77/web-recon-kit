@@ -16,9 +16,12 @@ and drive headless Chromium through the `session.page` handle it yields:
   `inventory/api_endpoints.json`. This is static analysis of code the target already
   ships to browsers — **no API key required**.
 - **`runners/r1_recon.py` — gate classification + screenshots.** Renders each route in
-  `[recon].routes`, watches the document response, follows client-side redirects, captures
-  console/network state, and writes a full-page screenshot per route to
-  `results/screens/`.
+  `[recon].routes`, watches the document response, follows client-side redirects, records
+  each route's `console_errors` (error-level console messages + uncaught page errors,
+  sliced from polyfetch's accumulating session capture), and writes a full-page screenshot
+  per route to `results/screens/`. **Vantage-scoped**: this reflects only the runner's own
+  headless network — a CORS/extension/proxy failure a real user's browser hits can read
+  clean here.
 
 ### Gate classification
 

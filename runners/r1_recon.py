@@ -27,6 +27,7 @@ class ReconRow(TypedDict):
     final_url: str
     gate: str
     title: str
+    console_errors: list[str]
 
 
 def classify(route: str, doc_http: int | None, final_url: str) -> str:
@@ -59,9 +60,11 @@ def main() -> None:
                     ds["code"] = cast(int, getattr(resp, "status", None))
 
             page.on("response", on_resp)
+            mark = len(session.console_errors)
             with contextlib.suppress(Exception):
                 page.goto(base + route, wait_until="domcontentloaded", timeout=25000)
             page.wait_for_timeout(2500)
+            console_errors = list(session.console_errors[mark:])
             final_url = cast(str, page.url).replace(base, "") or "/"
             title = cast(str, page.title() or "")[:80]
             slug = route.strip("/").replace("/", "_") or "root"
@@ -69,8 +72,10 @@ def main() -> None:
                 page.screenshot(path=str(shots / f"{slug}.png"), full_page=False)
             gate = classify(route, doc_status["code"], final_url)
             rows.append({"route": route, "doc_http": doc_status["code"],
-                         "final_url": final_url, "gate": gate, "title": title})
-            print(f"  {route:<16} doc={doc_status['code']} -> {final_url:<28} [{gate}]")
+                         "final_url": final_url, "gate": gate, "title": title,
+                         "console_errors": console_errors})
+            print(f"  {route:<16} doc={doc_status['code']} -> {final_url:<28} "
+                  f"[{gate}] errs={len(console_errors)}")
             page.remove_listener("response", on_resp)
 
     out = ROOT / "results" / "recon.jsonl"

@@ -177,7 +177,7 @@ conflicts expected; recipe: keep both sides). lib/types.py: A2/A3 vs B3 — diff
 | 9 | A1 · #29 `feat(scope): RECON_SCOPE selects the scope file` | A | agent | DONE — merged as [PR #44](https://github.com/qte77/web-recon-kit/pull/44) (owner accepted 2026-09-18, authored by "dntywntme"); `Closes #29` |
 | 10 | A2 · #30 `feat(inventory): configurable path_prefixes for bundle mining` | A | agent | DONE — merged as [PR #45](https://github.com/qte77/web-recon-kit/pull/45) (owner accepted 2026-09-18, authored by "dntywntme"); `Closes #30` |
 | 11 | A3 · #17 `feat(bola): dotted collection_key and configurable id_field` | A | agent | DONE — merged as [PR #46](https://github.com/qte77/web-recon-kit/pull/46); `Refs #17` + comment (shipped dotted key + id_field; pagination/multi-segment/spec-discovery deferred) |
-| 12 | B1 · #21-1 `feat(recon): record per-route console_errors in recon.jsonl` | B | agent | gate + CI green; merged; `Refs #21` |
+| 12 | B1 · #21-1 `feat(recon): record per-route console_errors in recon.jsonl` | B | agent | DONE — merged as [PR #47](https://github.com/qte77/web-recon-kit/pull/47); `Refs #21` |
 | 13 | B2 · #31 `fix(browser): guard the polyfetch import with an actionable exit-2 hint` | B | agent | authored by "dntywntme" — **owner accepted 2026-09-18**, unblocked; tests RED→GREEN; local proof (exit 2 + hint) quoted; merged; `Refs #31` + comment |
 | 14 | B3 · #21-2 `feat(recon): audit Set-Cookie security flags per route` | B | agent | tests RED→GREEN; lib cov ≥ 80 %; merged; `Refs #21` + comment |
 | 15 | C1 · #13 `ci: browser-tier import smoke for the polyfetch extra` | C | agent | job runs green on its own PR + actionlint/zizmor green; merged; `gh workflow run` green; `Closes #13` |

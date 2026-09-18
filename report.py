@@ -79,7 +79,9 @@ def section_recon(md: list[str]) -> None:
         return
     md.append("## Recon / gate taxonomy\n")
     for r in rows:
-        md.append(f"- `{r['route']}` → {r['gate']} (doc {r['doc_http']}, final `{r['final_url']}`)")
+        errs = len(cast(list[object], r.get("console_errors", [])))
+        md.append(f"- `{r['route']}` → {r['gate']} (doc {r['doc_http']}, "
+                  f"final `{r['final_url']}`, {errs} console errors)")
 
 
 def main() -> None:
