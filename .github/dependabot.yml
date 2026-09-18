@@ -6,6 +6,16 @@ updates:
       interval: "weekly"
     groups:
       python-deps:
+        applies-to: version-updates
+        patterns: ["*"]
+      # Without a dedicated security-updates group, Dependabot opens one PR PER vulnerable
+      # package instead of bundling them — and since pip-audit fails on ANY known vulnerability,
+      # each individual PR shows a false-looking "failing" audit until every sibling PR also
+      # lands (each one alone still leaves the others' CVEs present). Confirmed 2026-09-18: three
+      # such PRs (pip/httpx2/httpcore2) sat unmerged for 10 days for exactly this reason — each
+      # looked broken in isolation. This group fixes that going forward.
+      python-deps-security:
+        applies-to: security-updates
         patterns: ["*"]
     commit-message:
       prefix: "chore(deps)"
@@ -16,6 +26,10 @@ updates:
       interval: "weekly"
     groups:
       github-actions:
+        applies-to: version-updates
+        patterns: ["*"]
+      github-actions-security:
+        applies-to: security-updates
         patterns: ["*"]
     commit-message:
       prefix: "chore(ci)"
