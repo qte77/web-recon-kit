@@ -4,22 +4,59 @@
 the exploration behind it is already done (see "Source map & verified facts" at the end) —
 do not re-explore the codebase or re-run the GitHub audits before acting.
 
-**Status:** this plan document landed via
-[PR #36](https://github.com/qte77/web-recon-kit/pull/36) (row 5 below — see "Sequencing").
-It is a handoff artifact for the next session (or the repo owner) to resume from — **not** a
-signal to auto-continue: execution of the rest of the arc (rows 1-16) is **paused pending an
-explicit go-ahead from the repo owner**. Every row below gets struck with its PR number in
-the SAME PR that ships it; re-read this file's remaining-work table for current status
-before resuming.
+**Status (updated 2026-09-18, 9 days after this plan first landed via
+[PR #36](https://github.com/qte77/web-recon-kit/pull/36)):** rows 1-4 and 6 are now DONE,
+but most landed by a **different mechanism** than this plan specified — the repo owner
+(with a separate Claude session, not this one) did most of Lane 0 directly during the gap,
+rather than through the agent-executed slice-0/grouped-PR design below. Re-verified against
+live GitHub state and independently re-audited by a subagent (2026-09-18): all sound, no
+regressions. Specifics:
+- Row 1 (#26) and row 4 (#32): merged — #26 by the owner's process on 2026-09-18, #32 by
+  this session today after an `update-branch` API call cleared a BEHIND state.
+- Row 2 (slice 0): done differently — no grouped agent PR was ever created. The owner
+  merged [PR #33](https://github.com/qte77/web-recon-kit/pull/33) (pip→26.2) and
+  [PR #34](https://github.com/qte77/web-recon-kit/pull/34) (httpx2→2.12.0) individually.
+  Main's `audit` check is green.
+- Row 3: done — [PR #35](https://github.com/qte77/web-recon-kit/pull/35) (httpcore2) was
+  **closed unmerged** by the owner ("httpcore2 is up-to-date now") once httpx2's bump
+  satisfied it transitively. Verified: zero open Dependabot alerts remain.
+- Row 6 (dependabot config): done differently —
+  [PR #39](https://github.com/qte77/web-recon-kit/pull/39) (qte77, Claude-assisted) added
+  `python-deps-security`/`github-actions-security` groups. It deliberately keeps majors
+  inside the version-updates group (no `update-types` restriction) — an intentional owner
+  design choice with its own documented rationale in the file, not a gap to "fix" back to
+  this plan's original design.
+- Row 6's labels sub-task: done **this session** — `dependencies`/`python`/`github-actions`
+  didn't exist for the entire 9-day gap (confirmed cause of a real "labels could not be
+  found" error Dependabot hit on PR #35's rebase attempts); created now, retroactively
+  applied to #26/#32 before merging.
+- Row 7 (verify grouping): still open, gate `data` — needs the next real Dependabot run.
+- Row 8 (follow-up issue): **not opened yet** — still valid, still worth doing.
 
-**Next action, in order:** (1) commit this plan doc to the repo — see "Sequencing" — only
-once that PR is on main and the arc's execution is explicitly approved does anything else
-proceed — (2) table row 1 (merge PR #26) → (3) row 2 (slice 0: fix the pip-audit findings
-that block every other merge) → (4) rows 3-8 (Lane 0 cleanup: close superseded Dependabot
-PRs, merge #32, fix the Dependabot grouping config, open one follow-up issue) — in parallel
-with (4'): Lanes A/B/C start their own first slices (rows 9, 12, 15) in their own worktrees
-as soon as the docs(plan) PR is on main. Full order and dependencies: "Sequencing" +
-"Remaining-work table" below.
+**New since this plan was first written, folded in below:** issue #38 (qte77, a real bug
+found via a live engagement — `report.py` doesn't apply `scope.toml`'s `public_ok`
+whitelist) — new row 8b. [PR #37](https://github.com/qte77/web-recon-kit/pull/37) (qte77,
+Claude-assisted, unrelated `Makefile` `.env` path-lookup fix) also merged during the gap —
+independently verified sound, no action needed, not part of this arc's scope.
+
+**Needs an explicit owner decision before Lane A proceeds — discovered 2026-09-18, missed
+when this plan was first written:** #29 and #30 (originally rows 9-10) are authored by a
+different GitHub user ("dntywntme"), **not qte77**. This arc was scoped to the repo owner's
+own backlog; the original analysis treated all 7 issues as one undifferentiated set without
+checking authorship. Implementing another contributor's feature request under an
+owner-directed unattended arc is a different call than executing the owner's own backlog —
+rows 9-10 are marked `owner`-gated pending that decision (options: implement as specced
+anyway, ask the contributor for more detail first, or leave for them to PR themselves). #17
+(row 11) is unaffected — it IS qte77's own issue.
+
+**Next action, in order:** rows 1-8b are now all DONE (this session closed out rows 8 and 8b
+too — issue #41 opened, #38 fixed via PR #40). Remaining: (1) owner decides rows 9-10
+(#29/#30 authorship — see above); (2) rows 11-15 (Lane A's #17, Lane B, Lane C1) — still
+valid as specced, still need the worktree-git blocker resolved (see below) or the
+coordinator doing each lane's git operations directly, as was done for rows 1/4/6/8/8b this
+session; (3) row 16 stays owner-gated; (4) row 7 (data gate) resolves itself whenever
+Dependabot's next run fires. Full order and dependencies: "Sequencing" + "Remaining-work
+table" below.
 
 **The loop (parallel subagents in worktrees — yes, this plan is set up for that):** the
 coordinator launches one **fresh `general-purpose` agent per lane** (Lane 0, A, B, C) with
@@ -36,6 +73,10 @@ not run any git command at all until that hook is patched to exempt `git`. Confi
 has landed (or find another way to give worktree agents real git access) before assuming
 this loop works as designed. The main coordinator thread itself is unaffected (it is not
 worktree-isolated) and can always fall back to doing a lane's git operations itself.
+**Confirmed still unpatched as of 2026-09-18** (re-read the hook file directly — unchanged
+since 2026-09-09) — this session did rows 1/4/6's git work from the coordinator thread
+directly rather than via a worktree agent, proving the fallback works; the parallel-lane
+design still needs the patch (or a permission rule) to actually run lanes concurrently.
 
 **Owner gates (the only non-agent steps):** row 16 — running the browser-tier recon runner
 against a real authorized target to see `console_errors`/`cookie_findings` in the output
@@ -127,17 +168,18 @@ conflicts expected; recipe: keep both sides). lib/types.py: A2/A3 vs B3 — diff
 
 | # | Item | Lane | Gate | Done-when |
 | --- | --- | --- | --- | --- |
-| 1 | Squash-merge PR #26 (github-actions group) | 0 | agent | merged; PR's own checks + Lint Workflows green (main's push CI stays audit-red until row 2 — expected, not a failure) |
-| 2 | Read #32's audit log first; if its own bumps introduce a vulnerable pin, fold them into slice 0's `--upgrade-package` list and close #32 as superseded too; else proceed as planned. Slice 0 `chore(deps): fix pip-audit findings (pip 26.2, httpx2 2.12, httpcore2 2.10)` | 0 | agent | local gate incl. `pip-audit` clean; PR all checks green; merged; latest main CI green incl. audit |
-| 3 | Close #33/#34/#35 (and #32 if folded) as superseded (if Dependabot has not) with "superseded by #<2>" | 0 | agent | `gh pr list --author app/dependabot` shows only #32 (or none, if folded) |
-| 4 | If #32 not folded into slice 0: `@dependabot rebase` #32 → all checks green → squash-merge | 0 | agent | merged; no open dependabot PRs |
-| 5 | `docs(plan): add arc 0001` — `docs/plans/0001-housekeeping-and-issue-backlog.md` (this plan, repo form) + roadmap link | 0 | agent | merged as [PR #36](https://github.com/qte77/web-recon-kit/pull/36) |
-| 6 | `chore(dependabot): group security + version updates; create labels` (+ `gh label create dependencies/python/github-actions`) | 0 | agent | schema-valid; merged; labels exist |
-| 7 | Verify grouping: next Dependabot security/weekly run opens grouped, labeled PRs | 0 | data | one grouped `python-security`/`python-deps` PR carrying labels observed |
-| 8 | Open follow-up issue: runner-local `ROOT`s + `load_endpoints`/`write_jsonl` make multi-target runs share `results/`/`inventory/` (out of #29 scope) | 0 | agent | issue exists, linked from #29's PR body |
-| 9 | A1 · #29 `feat(scope): RECON_SCOPE selects the scope file` | A | agent | 3 new tests RED→GREEN; gate + CI green; merged; `Closes #29` |
-| 10 | A2 · #30 `feat(inventory): configurable path_prefixes for bundle mining` | A | agent | tests RED→GREEN; gate + CI green; merged; `Closes #30` |
-| 11 | A3 · #17 `feat(bola): dotted collection_key and configurable id_field` | A | agent | tests RED→GREEN; gate + CI green; merged; `Refs #17` + comment |
+| 1 | Squash-merge PR #26 (github-actions group) | 0 | agent | DONE — merged [#26](https://github.com/qte77/web-recon-kit/pull/26) 2026-09-18 |
+| 2 | Fix the pip-audit findings blocking every merge | 0 | agent | DONE, differently — [#33](https://github.com/qte77/web-recon-kit/pull/33) (pip→26.2) + [#34](https://github.com/qte77/web-recon-kit/pull/34) (httpx2→2.12.0) merged individually by the owner; no grouped agent PR was created; main `audit` green |
+| 3 | Close superseded Dependabot PRs | 0 | agent | DONE — [#35](https://github.com/qte77/web-recon-kit/pull/35) (httpcore2) closed unmerged by the owner, satisfied transitively; 0 open Dependabot alerts confirmed |
+| 4 | Merge #32 (python-deps group) | 0 | agent | DONE — merged [#32](https://github.com/qte77/web-recon-kit/pull/32) 2026-09-18 (needed an `update-branch` API call first to clear a BEHIND state) |
+| 5 | `docs(plan): add arc 0001` — `docs/plans/0001-housekeeping-and-issue-backlog.md` + roadmap link | 0 | agent | DONE — merged as [PR #36](https://github.com/qte77/web-recon-kit/pull/36) |
+| 6 | Group security + version dependabot updates; create labels | 0 | agent | DONE, differently — config via [PR #39](https://github.com/qte77/web-recon-kit/pull/39) (owner's own design, majors not isolated — deliberate, not a gap); labels created 2026-09-18 (this session), retroactively applied to #26/#32 |
+| 7 | Verify grouping: next Dependabot security/weekly run opens grouped, labeled PRs | 0 | data | still open — no Dependabot run has fired against the new config yet; observe and record here |
+| 8 | Open follow-up issue: runner-local `ROOT`s + `load_endpoints`/`write_jsonl` make multi-target runs share `results/`/`inventory/` (independent of #29, which hasn't shipped) | 0 | agent | DONE — opened as [issue #41](https://github.com/qte77/web-recon-kit/issues/41) |
+| 8b | #38 (qte77, real bug from a live engagement) — `report.py` doesn't apply `scope.toml`'s `public_ok` whitelist, so whitelisted paths show as false-positive findings | 0 | agent | DONE — merged as [PR #40](https://github.com/qte77/web-recon-kit/pull/40); verified with an isolated in-process dry run (no `lib/`-level test — this is thin-script wiring, not module logic) |
+| 9 | A1 · #29 `feat(scope): RECON_SCOPE selects the scope file` | A | **owner** | **BLOCKED — #29 is authored by "dntywntme", not qte77** (found 2026-09-18). Owner decides: implement as specced, ask for more detail, or leave for the contributor to PR |
+| 10 | A2 · #30 `feat(inventory): configurable path_prefixes for bundle mining` | A | **owner** | **BLOCKED — same authorship issue as row 9** (#30 also by "dntywntme") |
+| 11 | A3 · #17 `feat(bola): dotted collection_key and configurable id_field` | A | agent | still valid (qte77's own issue) — tests RED→GREEN; gate + CI green; merged; `Refs #17` + comment |
 | 12 | B1 · #21-1 `feat(recon): record per-route console_errors in recon.jsonl` | B | agent | gate + CI green; merged; `Refs #21` |
 | 13 | B2 · #31 `fix(browser): guard the polyfetch import with an actionable exit-2 hint` | B | agent | tests RED→GREEN; local proof (exit 2 + hint) quoted; merged; `Refs #31` + comment |
 | 14 | B3 · #21-2 `feat(recon): audit Set-Cookie security flags per route` | B | agent | tests RED→GREEN; lib cov ≥ 80 %; merged; `Refs #21` + comment |
