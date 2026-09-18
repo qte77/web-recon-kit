@@ -28,7 +28,8 @@ def section_authmatrix(md: list[str]) -> None:
     by_status: Counter[str] = Counter(f"{r['identity']}:{r['status']}" for r in rows)
     md.append(f"- {len(rows)} probes across identities.")
     exposed = sorted(
-        {str(r["path"]) for r in rows if r["identity"] == "noauth" and r["status"] == 200}
+        {str(r["path"]) for r in rows
+         if r["identity"] == "noauth" and r["status"] == 200 and not r.get("public", False)}
     )
     md.append(f"- **Unauth-200 (non-public review): {len(exposed)}**")
     for p in exposed:
