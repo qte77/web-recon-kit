@@ -80,8 +80,10 @@ def section_recon(md: list[str]) -> None:
     md.append("## Recon / gate taxonomy\n")
     for r in rows:
         errs = len(cast(list[object], r.get("console_errors", [])))
+        weak_cookies = len(cast(list[object], r.get("cookie_findings", [])))
         md.append(f"- `{r['route']}` → {r['gate']} (doc {r['doc_http']}, "
-                  f"final `{r['final_url']}`, {errs} console errors)")
+                  f"final `{r['final_url']}`, {errs} console errors, "
+                  f"{weak_cookies} weak cookies)")
 
 
 def main() -> None:

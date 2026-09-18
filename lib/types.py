@@ -59,6 +59,13 @@ class InventoryCfg(TypedDict):
     path_prefixes: NotRequired[list[str]]
 
 
+class CookieFinding(TypedDict):
+    name: str
+    missing_httponly: bool
+    missing_secure: bool
+    samesite: str  # "strict" | "lax" | "none" | "unset"
+
+
 class Scope(TypedDict):
     base_url: str
     identities: dict[str, IdentitySpec]
