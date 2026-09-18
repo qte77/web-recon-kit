@@ -60,10 +60,13 @@ path_prefixes = ["/api/"]
 # them (as `tenant_b`) for cross-tenant leaks. Each collector needs:
 #   kind            - short label for this resource type
 #   list_path       - GET endpoint that lists the collection
-#   collection_key  - key in the JSON body holding the list of items
+#   collection_key  - key in the JSON body holding the list of items; may be
+#                     dotted for a nested body, e.g. "data.result.items"
 #   probe_template  - by-id GET path, with "{id}" as the placeholder
+#   id_field        - (optional) item key holding the id; defaults to "id"
 # [[bola.collectors]]
 # kind = "widget"
 # list_path = "/api/widgets"
 # collection_key = "widgets"
 # probe_template = "/api/widgets/{id}"
+# id_field = "id"
