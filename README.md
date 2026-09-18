@@ -61,7 +61,9 @@ workflow/verify_findings.workflow.js  # agentic adversarial verification (option
 - **API tier** (r2/r3, report) — needs only `httpx`. `make setup`, then `uv run python …`.
 - **Browser tier** (inventory, recon) — needs the optional `browser` extra, which pulls
   [polyfetch-scrape][poly] (+ patchright) from GitHub. `make setup-browser` installs it and the
-  Chromium binary; API-tier users can skip it.
+  Chromium binary; API-tier users can skip it. Without the extra (or on musllinux, where it's
+  unavailable), both browser-tier runners exit 2 with an install hint instead of a raw
+  `ImportError`.
 
 [poly]: https://github.com/qte77/polyfetch-scrape
 
