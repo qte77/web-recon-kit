@@ -4,56 +4,32 @@
 the exploration behind it is already done (see "Source map & verified facts" at the end) —
 do not re-explore the codebase or re-run the GitHub audits before acting.
 
-**Status (updated 2026-09-18, 9 days after this plan first landed via
-[PR #36](https://github.com/qte77/web-recon-kit/pull/36)):** rows 1-4 and 6 are now DONE,
-but most landed by a **different mechanism** than this plan specified — the repo owner
-(with a separate Claude session, not this one) did most of Lane 0 directly during the gap,
-rather than through the agent-executed slice-0/grouped-PR design below. Re-verified against
-live GitHub state and independently re-audited by a subagent (2026-09-18): all sound, no
-regressions. Specifics:
-- Row 1 (#26) and row 4 (#32): merged — #26 by the owner's process on 2026-09-18, #32 by
-  this session today after an `update-branch` API call cleared a BEHIND state.
-- Row 2 (slice 0): done differently — no grouped agent PR was ever created. The owner
-  merged [PR #33](https://github.com/qte77/web-recon-kit/pull/33) (pip→26.2) and
-  [PR #34](https://github.com/qte77/web-recon-kit/pull/34) (httpx2→2.12.0) individually.
-  Main's `audit` check is green.
-- Row 3: done — [PR #35](https://github.com/qte77/web-recon-kit/pull/35) (httpcore2) was
-  **closed unmerged** by the owner ("httpcore2 is up-to-date now") once httpx2's bump
-  satisfied it transitively. Verified: zero open Dependabot alerts remain.
-- Row 6 (dependabot config): done differently —
-  [PR #39](https://github.com/qte77/web-recon-kit/pull/39) (qte77, Claude-assisted) added
-  `python-deps-security`/`github-actions-security` groups. It deliberately keeps majors
-  inside the version-updates group (no `update-types` restriction) — an intentional owner
-  design choice with its own documented rationale in the file, not a gap to "fix" back to
-  this plan's original design.
-- Row 6's labels sub-task: done **this session** — `dependencies`/`python`/`github-actions`
-  didn't exist for the entire 9-day gap (confirmed cause of a real "labels could not be
-  found" error Dependabot hit on PR #35's rebase attempts); created now, retroactively
-  applied to #26/#32 before merging.
-- Row 7 (verify grouping): still open, gate `data` — needs the next real Dependabot run.
-- Row 8 (follow-up issue): **not opened yet** — still valid, still worth doing.
+**Status (updated 2026-09-18): arc essentially complete.** Rows 1-15 are all DONE (PRs #26,
+#32-#34, #39-#40, #44-#50; #35 closed unmerged) — every agent-executable item has shipped.
+Only two rows remain, neither actionable right now:
+- **Row 7** (`data` gate) — waits on the next real Dependabot run against the grouping
+  config in PR #39; nothing to do but observe.
+- **Row 16** (`owner` gate) — running the browser-tier recon runner against a real
+  authorized target to see `console_errors`/`cookie_findings` in practice; needs
+  `scope.toml` + a glibc host + `uv sync --extra browser`, none of which exist in this
+  sandbox.
+D1-D4 stay deferred (upstream-blocked or YAGNI). Verified live 2026-09-18: zero open PRs,
+zero open Dependabot alerts, `dependencies`/`python`/`github-actions` labels exist, #29/#30/
+#13/#38 closed by their PRs, #21/#31/#17/#25/#41 remain open exactly as expected (deferred
+sub-scope or upstream-blocked) — see the remaining-work table for exact PR numbers per row.
 
-**New since this plan was first written, folded in below:** issue #38 (qte77, a real bug
-found via a live engagement — `report.py` doesn't apply `scope.toml`'s `public_ok`
-whitelist) — new row 8b. [PR #37](https://github.com/qte77/web-recon-kit/pull/37) (qte77,
-Claude-assisted, unrelated `Makefile` `.env` path-lookup fix) also merged during the gap —
-independently verified sound, no action needed, not part of this arc's scope.
-
-**Owner decision recorded 2026-09-18 — #29/#30/#31 accepted:** #29, #30, and #31 (rows 9,
-10, 13) are authored by a different GitHub user ("dntywntme"), not qte77 — missed when this
-plan was first written (all 7 issues were treated as one undifferentiated set without
-checking authorship; #31 itself was missed in the first authorship-correction pass and
-caught only on a second check). Flagged to the owner as a distinct decision (implementing a
-contributor's feature request is a different call than executing the owner's own backlog);
-**the owner explicitly accepted all three for implementation**, so rows 9, 10, 13 are back
-to `agent`-gated, unblocked, same specs as originally written — no re-design needed.
-
-**Next action, in order:** rows 1-8b are DONE. Rows 9, 10, 11, 12, 13, 14, 15 are all
-`agent`-gated and unblocked (#29/#30/#31 accepted; #17/#21/#13 were never blocked) — still
-need the worktree-git blocker resolved (see below) or the coordinator doing each lane's git
-operations directly, as was done for rows 1/4/6/8/8b this session. Row 16 stays owner-gated
-(needs a real target). Row 7 (data gate) resolves itself whenever Dependabot's next run
-fires. Full order and dependencies: "Sequencing" + "Remaining-work table" below.
+**How this arc actually played out** (for anyone auditing the process, not just the
+outcome): rows 1-6 were done partly by the repo owner directly during a 9-day session gap
+(PRs #26, #32-#34, #39, plus unrelated #37) rather than through this plan's original
+slice-0/grouped-PR design — all independently re-verified sound. Two things were missed on
+the first pass and caught on re-verification: (1) issue #38, a real bug found via a live
+engagement, was folded in as row 8b; (2) #29/#30/#31 turned out to be authored by a
+different GitHub user ("dntywntme"), not qte77 — flagged as a distinct decision (implementing
+a contributor's request under an owner-directed arc isn't the same as executing the owner's
+own backlog) and the owner explicitly accepted all three, so they shipped unmodified from
+their original specs. The worktree-git blocker (see below) was never resolved, so every row
+was executed by the coordinator thread directly rather than via parallel worktree lanes —
+proven twice to work fine, just serially.
 
 **The loop (parallel subagents in worktrees — yes, this plan is set up for that):** the
 coordinator launches one **fresh `general-purpose` agent per lane** (Lane 0, A, B, C) with
