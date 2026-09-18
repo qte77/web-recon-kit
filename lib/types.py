@@ -83,6 +83,7 @@ class MatrixRow(TypedDict):
     identity: str
     status: int | None
     content_type: str
+    public: bool
 
 
 class CronRow(TypedDict):

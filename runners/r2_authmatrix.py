@@ -40,7 +40,8 @@ async def main() -> None:
         async def one(path: str, module: str, label: str, token: str | None) -> None:
             r = await get(client, thr, base, path, token)
             rows.append({"path": path, "module": module, "identity": label,
-                         "status": r["status"], "content_type": r["content_type"]})
+                         "status": r["status"], "content_type": r["content_type"],
+                         "public": path in public})
 
         await asyncio.gather(*[
             one(ep["path"], ep["module"], label, token)
