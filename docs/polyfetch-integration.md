@@ -11,9 +11,10 @@ Both browser-tier runners import a single entry point — `polyfetch_scrape.rend
 and drive headless Chromium through the `session.page` handle it yields:
 
 - **`inventory/build_inventory.py` — JS-bundle mining.** Loads the target, then runs
-  in-page JS to fetch every same-host `*.js` bundle and greps them for `/api/*` string
-  literals, producing `inventory/api_endpoints.json`. This is static analysis of code the
-  target already ships to browsers — **no API key required**.
+  in-page JS to fetch every same-host `*.js` bundle and greps them for string literals
+  under the configured `[inventory].path_prefixes` (default `/api/`), producing
+  `inventory/api_endpoints.json`. This is static analysis of code the target already
+  ships to browsers — **no API key required**.
 - **`runners/r1_recon.py` — gate classification + screenshots.** Renders each route in
   `[recon].routes`, watches the document response, follows client-side redirects, captures
   console/network state, and writes a full-page screenshot per route to

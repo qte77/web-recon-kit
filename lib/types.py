@@ -54,6 +54,10 @@ class BolaCfg(TypedDict):
     collectors: NotRequired[list[BolaCollector]]
 
 
+class InventoryCfg(TypedDict):
+    path_prefixes: NotRequired[list[str]]
+
+
 class Scope(TypedDict):
     base_url: str
     identities: dict[str, IdentitySpec]
@@ -63,6 +67,7 @@ class Scope(TypedDict):
     authmatrix: NotRequired[AuthMatrixCfg]
     bfla: NotRequired[BflaCfg]
     bola: NotRequired[BolaCfg]
+    inventory: NotRequired[InventoryCfg]
 
 
 class GetResult(TypedDict):

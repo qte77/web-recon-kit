@@ -43,7 +43,7 @@ scope.toml                  # your target's base_url, identities, rate/safety, r
                              #   public-ok list, admin prefixes, BOLA collectors — git-ignored
 lib/                         # typed shared core: config, throttle, async client, scope accessors
 inventory/
-  build_inventory.py        # (re)mine /api/* surface from JS bundles  [browser tier]
+  build_inventory.py        # (re)mine API paths from JS bundles, [inventory].path_prefixes  [browser tier]
   api_endpoints.json        # generated inventory — git-ignored
 runners/
   r1_recon.py               # (1) render + gate classification + screenshots  [browser]

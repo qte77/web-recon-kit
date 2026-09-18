@@ -74,6 +74,12 @@ def bola_collectors(scope: Scope) -> list[BolaCollector]:
     return list(collectors) if collectors is not None else []
 
 
+def inventory_prefixes(scope: Scope) -> tuple[str, ...]:
+    cfg = scope.get("inventory")
+    prefixes = cfg.get("path_prefixes") if cfg is not None else None
+    return tuple(prefixes) if prefixes is not None else ("/api/",)
+
+
 def identities(scope: Scope) -> dict[str, ResolvedIdentity]:
     """Resolve each identity's bearer token from the environment."""
     out: dict[str, ResolvedIdentity] = {}
