@@ -180,7 +180,7 @@ conflicts expected; recipe: keep both sides). lib/types.py: A2/A3 vs B3 — diff
 | 12 | B1 · #21-1 `feat(recon): record per-route console_errors in recon.jsonl` | B | agent | DONE — merged as [PR #47](https://github.com/qte77/web-recon-kit/pull/47); `Refs #21` |
 | 13 | B2 · #31 `fix(browser): guard the polyfetch import with an actionable exit-2 hint` | B | agent | DONE — merged as [PR #48](https://github.com/qte77/web-recon-kit/pull/48) (owner accepted 2026-09-18, authored by "dntywntme"); local proof: both runners exit 2 with the hint (polyfetch_scrape not installed here); `Refs #31` + comment |
 | 14 | B3 · #21-2 `feat(recon): audit Set-Cookie security flags per route` | B | agent | DONE — merged as [PR #49](https://github.com/qte77/web-recon-kit/pull/49); lib cov 97%; `Refs #21` + comment |
-| 15 | C1 · #13 `ci: browser-tier import smoke for the polyfetch extra` | C | agent | job runs green on its own PR + actionlint/zizmor green; merged; `gh workflow run` green; `Closes #13` |
+| 15 | C1 · #13 `ci: browser-tier import smoke for the polyfetch extra` | C | agent | DONE — merged as PR #<PR_NUMBER>; actionlint/zizmor clean; `Closes #13` |
 | 16 | Browser-tier e2e of B1/B3 against an authorized target (needs `scope.toml`, glibc host, `uv sync --extra browser`) | B | owner | owner runs `uv run python runners/r1_recon.py`; rows show `console_errors`/`cookie_findings` |
 | D1 | #21-3 runtime network log | — | deferred (upstream polyfetch-scrape#182) | — |
 | D2 | #17 pagination, multi-segment templates, spec auto-discovery | — | deferred (YAGNI until a concrete target needs it) | — |

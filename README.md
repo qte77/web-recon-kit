@@ -117,6 +117,11 @@ make audit        # pip-audit (SCA)
 make check        # all four
 ```
 
+A separate `.github/workflows/browser-tier.yml` runs an import-only smoke test of the
+optional `browser` extra + both browser-tier runners — only when `pyproject.toml`,
+`uv.lock`, or those runners change, plus weekly — so polyfetch API breakage is caught
+without a Chromium download on every normal PR.
+
 ## Category-2/3 prerequisites
 
 - **BOLA (r3_bola):** needs a **second workspace** (the `tenant_b` identity) and
