@@ -85,7 +85,7 @@ make authmatrix       # (2) auth posture over all endpoints
 make cron             # (2) cron auth posture
 make bola             # (3) cross-tenant — skips cleanly if the tenant_b identity is unset
 make bfla             # (3) BFLA        — skips cleanly if the lowrole identity is unset
-make recon            # (1) gate classification + screenshots (browser tier)
+make recon            # (1) gate classification + console errors + screenshots (browser tier)
 make report           # -> results/report.md
 make all              # authmatrix + cron + bola + bfla + report
 ```
