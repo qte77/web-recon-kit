@@ -1,6 +1,7 @@
 # Example assessment-scope config. Copy to scope.toml and fill in your target.
 # API keys are read from the ENVIRONMENT (never store secrets here) — scope.toml
 # itself is git-ignored once you copy it, since it becomes target-specific.
+# Select a different file per run with RECON_SCOPE=/path/to/scope.toml (default: scope.toml).
 
 base_url = "https://TARGET.example.com"
 
