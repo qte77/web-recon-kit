@@ -50,7 +50,7 @@ scope.toml ──┐
 | `[recon]` `routes` / `cron_prefix` | routes r1_recon classifies / cron path prefix |
 | `[authmatrix]` `public_ok` | endpoints where an unauthenticated 200 is expected, not a finding |
 | `[bfla]` `admin_prefixes` | admin/RBAC path prefixes for r3_rbac_bfla |
-| `[[bola.collectors]]` | list-endpoint → by-id probe templates for r3_bola |
+| `[[bola.collectors]]` | list-endpoint → by-id probe templates for r3_bola (`collection_key` may be dotted; optional `id_field`, default `id`) |
 | `[inventory]` `path_prefixes` | literal path prefixes mined from JS bundles (default `["/api/"]`) |
 
 ## CLI / env reference

@@ -35,6 +35,7 @@ class BolaCollector(TypedDict):
     list_path: str
     collection_key: str
     probe_template: str
+    id_field: NotRequired[str]
 
 
 class ReconCfg(TypedDict):

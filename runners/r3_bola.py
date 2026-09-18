@@ -2,6 +2,7 @@
 try to read them as workspace B's owner. A 200 as tenant_b == cross-tenant leak.
 
 Requires identities `owner` and `tenant_b` (2nd workspace). Read-only GETs.
+`collection_key` may be dotted (e.g. "data.result.items"); `id_field` defaults to "id".
     uv run python runners/r3_bola.py
 """
 from __future__ import annotations
@@ -14,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import httpx
 
+from lib.bola import extract_ids
 from lib.client import (
     Throttle,
     bola_collectors,
@@ -24,19 +26,6 @@ from lib.client import (
     write_jsonl,
 )
 from lib.types import BolaRow
-
-
-def extract_ids(data: object, key: str) -> list[str]:
-    if not isinstance(data, dict):
-        return []
-    coll = data.get(key)
-    if not isinstance(coll, list):
-        return []
-    ids: list[str] = []
-    for item in coll:
-        if isinstance(item, dict) and "id" in item:
-            ids.append(str(item["id"]))
-    return ids
 
 
 async def main() -> None:
@@ -63,7 +52,7 @@ async def main() -> None:
                 c["kind"], c["list_path"], c["collection_key"], c["probe_template"],
             )
             status, data = await get_json(client, thr, base, list_path, owner["token"])
-            resource_ids = extract_ids(data, key)
+            resource_ids = extract_ids(data, key, c.get("id_field", "id"))
             if not resource_ids:
                 print(f"  [{kind}] owner list {list_path} -> HTTP {status}, 0 ids (skipping)")
                 continue
