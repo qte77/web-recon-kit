@@ -30,7 +30,7 @@ async def main() -> None:
     base = scope["base_url"]
     public = public_ok(scope)
     ids = identities(scope)
-    eps = load_endpoints()
+    eps = load_endpoints(scope)
     thr = Throttle(scope["rate"]["max_concurrency"], scope["rate"]["per_host_delay_ms"])
     probes: list[tuple[str, str | None]] = [("noauth", None)]
     probes += [(name, idn["token"]) for name, idn in ids.items() if idn["available"]]
@@ -48,7 +48,7 @@ async def main() -> None:
             for ep in eps for (label, token) in probes
         ])
 
-    write_jsonl("authmatrix.jsonl", rows)
+    out = write_jsonl(scope, "authmatrix.jsonl", rows)
     exposed = sorted(
         r["path"] for r in rows
         if r["identity"] == "noauth" and r["status"] == 200 and r["path"] not in public
@@ -58,7 +58,7 @@ async def main() -> None:
     print(f"\nUNAUTH-200 on non-public paths ({len(exposed)}) — review each:")
     for path in exposed:
         print("  ", path)
-    print("\n-> results/authmatrix.jsonl")
+    print(f"\n-> {out}")
 
 
 if __name__ == "__main__":

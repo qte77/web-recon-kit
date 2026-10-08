@@ -1,19 +1,31 @@
-"""Aggregate results/*.jsonl into results/report.md. Pure stdlib, strictly typed.
+"""Aggregate results/*.jsonl into results/report.md. Stdlib + lib.client, strictly typed.
+Reads the scope's results dir (see lib.client.output_dir); falls back to ./results
+when no scope file exists.
     uv run python report.py
 """
 from __future__ import annotations
 
 import json
 from collections import Counter
+from functools import cache
 from pathlib import Path
 from typing import cast
 
+from lib.client import load_scope, results_dir
+
 ROOT = Path(__file__).resolve().parent
-RESULTS = ROOT / "results"
+
+
+@cache
+def results_root() -> Path:
+    try:
+        return results_dir(load_scope())
+    except FileNotFoundError:
+        return ROOT / "results"
 
 
 def read(name: str) -> list[dict[str, object]]:
-    path = RESULTS / name
+    path = results_root() / name
     if not path.exists():
         return []
     return [cast("dict[str, object]", json.loads(line))
@@ -91,8 +103,8 @@ def main() -> None:
     for fn in (section_recon, section_authmatrix, section_cron, section_bola, section_bfla):
         fn(md)
         md.append("")
-    out = RESULTS / "report.md"
-    out.parent.mkdir(exist_ok=True)
+    out = results_root() / "report.md"
+    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(md) + "\n")
     print(f"-> {out}")
 

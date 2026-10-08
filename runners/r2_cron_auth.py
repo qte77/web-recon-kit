@@ -32,7 +32,7 @@ def classify(status: int | None) -> Verdict:
 async def main() -> None:
     scope = load_scope()
     base = scope["base_url"]
-    eps = [e for e in load_endpoints() if e["path"].startswith(cron_prefix(scope))]
+    eps = [e for e in load_endpoints(scope) if e["path"].startswith(cron_prefix(scope))]
     thr = Throttle(4, scope["rate"]["per_host_delay_ms"])
     rows: list[CronRow] = []
 
@@ -43,7 +43,7 @@ async def main() -> None:
             rows.append({"path": ep["path"], "get_noauth_status": r["status"], "verdict": verdict})
             print(f"  {r['status']!s:>4}  {verdict:<12} {ep['path']}")
 
-    write_jsonl("cron_auth.jsonl", rows)
+    write_jsonl(scope, "cron_auth.jsonl", rows)
     print(f"\n{len(eps)} cron endpoints probed (GET, no auth).")
     print("405 = route exists but GET not allowed; this does NOT prove the POST "
           "path is authenticated.")

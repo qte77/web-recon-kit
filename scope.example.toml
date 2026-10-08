@@ -55,6 +55,12 @@ admin_prefixes = ["/api/admin/"]
 # slash so "/claim" doesn't match "/claimant". Defaults to ["/api/"] if omitted.
 path_prefixes = ["/api/"]
 
+# [output]
+# Where results/ and inventory/ are written. Defaults to this scope file's own
+# directory (so targets/<name>/scope.toml -> targets/<name>/{results,inventory}/).
+# A relative dir resolves against this file's directory; absolute is used as-is.
+# dir = "out/acme"
+
 # [bola]
 # Collectors r3_bola uses to harvest resource IDs (as `owner`) and then probe
 # them (as `tenant_b`) for cross-tenant leaks. Each collector needs:

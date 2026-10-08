@@ -36,7 +36,7 @@ async def main() -> None:
               "(identity 'lowrole' in scope.toml).")
         return
 
-    eps = [e for e in load_endpoints() if e["path"].startswith(tuple(admin_prefixes(scope)))]
+    eps = [e for e in load_endpoints(scope) if e["path"].startswith(tuple(admin_prefixes(scope)))]
     thr = Throttle(scope["rate"]["max_concurrency"], scope["rate"]["per_host_delay_ms"])
     owner_tok = owner["token"] if owner and owner["available"] else None
     rows: list[BflaRow] = []
@@ -54,10 +54,10 @@ async def main() -> None:
             print(f"  {ep['path']:<42} owner={base_r['status']} low={low_r['status']} "
                   f"noauth={noauth_r['status']}{flag}")
 
-    write_jsonl("bfla.jsonl", rows)
+    out = write_jsonl(scope, "bfla.jsonl", rows)
     esc = [r for r in rows if r["escalation"]]
     print(f"\n{len(eps)} admin/RBAC endpoints; {len(esc)} member-reachable (BFLA candidates).")
-    print("-> results/bfla.jsonl")
+    print(f"-> {out}")
 
 
 if __name__ == "__main__":

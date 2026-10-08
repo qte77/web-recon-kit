@@ -16,11 +16,16 @@ from lib.client import (
     get,
     get_json,
     identities,
+    inventory_file,
     inventory_prefixes,
+    load_endpoints,
     load_scope,
+    output_dir,
     public_ok,
     recon_routes,
+    results_dir,
     scope_path,
+    write_jsonl,
 )
 from lib.types import Scope
 from runners.r2_cron_auth import classify
@@ -231,3 +236,60 @@ def test_load_scope_missing_file_fails_with_resolved_path(
     with pytest.raises(FileNotFoundError) as excinfo:
         load_scope()
     assert str(missing.resolve()) in str(excinfo.value)
+
+
+# --- per-scope output dir (#41) -------------------------------------------------
+# Outputs land next to the scope file (default ./scope.toml → repo root, unchanged);
+# `[output].dir` overrides, resolved against the scope file's directory.
+
+
+def test_output_dir_defaults_to_repo_root(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("RECON_SCOPE", raising=False)
+    assert output_dir(_scope()) == ROOT
+
+
+def test_output_dir_follows_relative_recon_scope(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("RECON_SCOPE", "a/scope.toml")
+    assert output_dir(_scope()) == tmp_path / "a"
+    assert results_dir(_scope()) == tmp_path / "a" / "results"
+    assert inventory_file(_scope()) == tmp_path / "a" / "inventory" / "api_endpoints.json"
+
+
+def test_output_dir_override_resolves_against_scope_dir(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("RECON_SCOPE", str(tmp_path / "a" / "scope.toml"))
+    scope = _scope()
+    scope["output"] = {"dir": "out/acme"}
+    assert output_dir(scope) == tmp_path / "a" / "out" / "acme"
+
+
+def test_output_dir_absolute_override_used_as_is(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("RECON_SCOPE", str(tmp_path / "a" / "scope.toml"))
+    scope = _scope()
+    scope["output"] = {"dir": str(tmp_path / "elsewhere")}
+    assert output_dir(scope) == tmp_path / "elsewhere"
+
+
+def test_write_jsonl_creates_nested_results_dir(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("RECON_SCOPE", str(tmp_path / "targets" / "x" / "scope.toml"))
+    out = write_jsonl(_scope(), "r.jsonl", [{"a": 1}, {"b": 2}])
+    assert out == tmp_path / "targets" / "x" / "results" / "r.jsonl"
+    assert out.read_text() == '{"a": 1}\n{"b": 2}\n'
+
+
+def test_load_endpoints_reads_scope_inventory(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("RECON_SCOPE", str(tmp_path / "scope.toml"))
+    inv = tmp_path / "inventory" / "api_endpoints.json"
+    inv.parent.mkdir()
+    inv.write_text('[{"path": "/api/x", "module": "x"}]')
+    assert load_endpoints(_scope()) == [{"path": "/api/x", "module": "x"}]
