@@ -93,7 +93,7 @@ Cloudflare → Google, overridable list; keep #56/#55 as specced; full plan doc.
 | 5 | ~~#41 per-scope output dir~~ ([PR #60](https://github.com/qte77/web-recon-kit/pull/60)) | 0 | agent | tests + dry run (two scope dirs → separate outputs, root untouched); `Closes #41` |
 | 6 | ~~#56 `--no-browser` static crawl~~ ([PR #61](https://github.com/qte77/web-recon-kit/pull/61)) | A | agent | non-empty inventory from code-split fixture, chunk cap tested; `Closes #56` |
 | 7a | ~~#55 DoH client + DNS checks~~ ([PR #62](https://github.com/qte77/web-recon-kit/pull/62)) | B | agent | fixture tests incl. fallback + split TXT; `Refs #55` |
-| 7b | ~~#55 headers + report section + `make posture`~~ (PR #TBD) | B | agent | fixture tests; report section; `Closes #55` |
+| 7b | ~~#55 headers + report section + `make posture`~~ ([PR #63](https://github.com/qte77/web-recon-kit/pull/63)) | B | agent | fixture tests; report section; `Closes #55` |
 | 8 | (from 0001 row 16) browser-tier e2e of `console_errors`/`cookie_findings` | — | owner | real-target rows show both fields |
 | 9 | Real-target e2e of #41/#56/#55 | — | owner | outputs per target dir; non-empty static inventory; `posture.jsonl` |
 | D1 | #21-3 network log | — | deferred | upstream polyfetch-scrape#182 (open) |
