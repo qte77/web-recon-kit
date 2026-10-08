@@ -46,6 +46,7 @@ inventory/
   build_inventory.py        # (re)mine API paths from JS bundles, [inventory].path_prefixes  [browser; --no-browser = API tier]
   api_endpoints.json        # generated inventory — git-ignored
 runners/
+  r0_posture.py             # (0) passive DNS posture: SPF/DMARC/null MX/CAA/DNSSEC via DoH
   r1_recon.py               # (1) render + gate classification + screenshots  [browser]
   r2_authmatrix.py          # (2) every endpoint x every identity, GET-probed
   r2_cron_auth.py           # (2) cron auth posture (safe GET probes)

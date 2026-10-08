@@ -58,6 +58,21 @@ path_prefixes = ["/api/"]
 # both modes (browser and --no-browser). Optional.
 # seed_paths = ["/api/health"]
 
+[posture]
+# Passive host posture (runners/r0_posture.py). Every key is optional.
+# domains: default = base_url host minus a leading "www."; list subdomains explicitly.
+# domains = ["example.test"]
+# DoH JSON resolvers, tried in order (next one on error/5xx/429). They see the names.
+# doh_urls = ["https://cloudflare-dns.com/dns-query", "https://dns.google/resolve"]
+# "send" (default) = exactly 1 SPF + DMARC >= dmarc_min_policy;
+# "none" = SPF "v=spf1 -all", DMARC p=reject, null MX.
+mail_profile = "send"
+dmarc_min_policy = "quarantine"   # none | quarantine | reject
+require_caa = true
+require_dnssec = false            # true = DS present + resolver-validated (AD)
+# caa_issuers = ["letsencrypt.org"]   # set to flag any other issuer
+# caa_extra_issuers = []              # CDN-added issuers to accept, not flag
+
 # [output]
 # Where results/ and inventory/ are written. Defaults to this scope file's own
 # directory (so targets/<name>/scope.toml -> targets/<name>/{results,inventory}/).

@@ -64,6 +64,60 @@ class OutputCfg(TypedDict):
     dir: NotRequired[str]
 
 
+MailProfile = Literal["none", "send"]
+DmarcPolicy = Literal["none", "quarantine", "reject"]
+Severity = Literal["high", "medium", "low", "info"]
+
+
+class PostureCfg(TypedDict):
+    domains: NotRequired[list[str]]
+    doh_urls: NotRequired[list[str]]
+    mail_profile: NotRequired[MailProfile]
+    dmarc_min_policy: NotRequired[DmarcPolicy]
+    require_caa: NotRequired[bool]
+    require_dnssec: NotRequired[bool]
+    hsts_min_max_age: NotRequired[int]
+    caa_issuers: NotRequired[list[str]]
+    caa_extra_issuers: NotRequired[list[str]]
+
+
+class PostureSettings(TypedDict):
+    """PostureCfg with every default applied (see lib.posture.settings)."""
+
+    domains: list[str]
+    doh_urls: list[str]
+    mail_profile: MailProfile
+    dmarc_min_policy: DmarcPolicy
+    require_caa: bool
+    require_dnssec: bool
+    hsts_min_max_age: int
+    caa_issuers: list[str]
+    caa_extra_issuers: list[str]
+
+
+class DohAnswer(TypedDict):
+    name: str
+    type: int
+    TTL: int
+    data: str
+
+
+class DohResponse(TypedDict):
+    """DNS-over-HTTPS JSON (Cloudflare `application/dns-json` / Google `/resolve`)."""
+
+    Status: int
+    AD: NotRequired[bool]
+    Answer: NotRequired[list[DohAnswer]]
+
+
+class PostureFinding(TypedDict):
+    domain: str
+    check: str
+    severity: Severity
+    ok: bool
+    detail: str
+
+
 class CookieFinding(TypedDict):
     name: str
     missing_httponly: bool
@@ -82,6 +136,7 @@ class Scope(TypedDict):
     bola: NotRequired[BolaCfg]
     inventory: NotRequired[InventoryCfg]
     output: NotRequired[OutputCfg]
+    posture: NotRequired[PostureCfg]
 
 
 class GetResult(TypedDict):
