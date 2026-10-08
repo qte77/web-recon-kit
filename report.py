@@ -98,9 +98,23 @@ def section_recon(md: list[str]) -> None:
                   f"{weak_cookies} weak cookies)")
 
 
+def section_posture(md: list[str]) -> None:
+    rows = read("posture.jsonl")
+    if not rows:
+        return
+    failing = [r for r in rows if not r["ok"]]
+    domains = sorted({str(r["domain"]) for r in rows})
+    md.append("## Posture (DNS + HTTP headers)\n")
+    md.append(f"- {len(rows)} checks across {len(domains)} domain(s); "
+              f"**{len(failing)} failing**.")
+    for r in failing:
+        md.append(f"  - `{r['domain']}` {r['check']} ({r['severity']}): {r['detail']}")
+
+
 def main() -> None:
     md: list[str] = ["# web-recon-kit — aggregated results\n"]
-    for fn in (section_recon, section_authmatrix, section_cron, section_bola, section_bfla):
+    for fn in (section_posture, section_recon, section_authmatrix, section_cron,
+               section_bola, section_bfla):
         fn(md)
         md.append("")
     out = results_root() / "report.md"

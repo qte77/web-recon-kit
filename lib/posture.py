@@ -1,7 +1,9 @@
-"""Passive host posture: DNS-over-HTTPS client + DNS checks (mypy --strict clean).
+"""Passive host posture: DNS-over-HTTPS client, DNS checks and HTTP security-header
+checks (mypy --strict clean).
 
-Lookups go to public DoH resolvers (JSON API), never to the target. A failed lookup is
-reported as `dns_lookup`, never as a missing record.
+DNS lookups go to public DoH resolvers (JSON API), never to the target; the target gets
+only `GET http://<d>/` + `GET https://<d>/`. A failed lookup or fetch is reported as
+`dns_lookup` / `headers_fetch`, never as a missing record or header.
 """
 from __future__ import annotations
 
@@ -16,6 +18,7 @@ from lib.client import Throttle
 from lib.types import (
     DmarcPolicy,
     DohResponse,
+    GetResult,
     PostureFinding,
     PostureSettings,
     Scope,
@@ -45,7 +48,16 @@ SEVERITY: dict[str, Severity] = {
     "caa": "low",
     "caa_issuers": "low",
     "dnssec": "low",
+    "headers_fetch": "info",
+    "https_redirect": "medium",
+    "hsts": "medium",
+    "csp": "low",
+    "nosniff": "low",
+    "referrer_policy": "info",
+    "permissions_policy": "info",
 }
+
+_MAX_AGE = re.compile(r'max-age\s*=\s*"?(\d+)"?', re.IGNORECASE)
 
 _DMARC_RANK: dict[str, int] = {"none": 0, "quarantine": 1, "reject": 2}
 _QUOTED = re.compile(r'"((?:[^"\\]|\\.)*)"')
@@ -198,4 +210,45 @@ def check_dns(
         out.append(_finding(domain, "dnssec", has_ds and validated,
                             f"DS {'present' if has_ds else 'missing'}, "
                             f"AD {'set' if validated else 'unset'}"))
+    return out
+
+
+def check_headers(
+    domain: str,
+    cfg: PostureSettings,
+    https_status: int | None,
+    headers: Mapping[str, str],
+    http: GetResult,
+) -> list[PostureFinding]:
+    """Findings from `GET https://<d>/` (status + lower-cased headers, no redirect
+    follow) and `GET http://<d>/` (expected: a 301/308 to https)."""
+    out: list[PostureFinding] = []
+    if http["status"] is None:
+        out.append(_finding(domain, "https_redirect", True,
+                            "no plain-HTTP response (port 80 unreachable)"))
+    else:
+        ok = http["status"] in (301, 308) and http["location"].startswith("https://")
+        out.append(_finding(domain, "https_redirect", ok,
+                            f"http:// -> {http['status']} {http['location'] or '(no Location)'}"
+                            ", want 301/308 to https://"))
+
+    if https_status is None:
+        out.append(_finding(domain, "headers_fetch", False, f"GET https://{domain}/ failed"))
+        return out
+
+    hsts = headers.get("strict-transport-security", "")
+    m = _MAX_AGE.search(hsts)
+    age = int(m.group(1)) if m else None
+    sub = "includeSubDomains" if "includesubdomains" in hsts.lower() else "no includeSubDomains"
+    out.append(_finding(domain, "hsts", age is not None and age >= cfg["hsts_min_max_age"],
+                        f"max-age={age}, {sub}, want max-age >= {cfg['hsts_min_max_age']}"
+                        if hsts else "Strict-Transport-Security missing"))
+    nosniff = headers.get("x-content-type-options", "")
+    out.append(_finding(domain, "nosniff", nosniff.strip().lower() == "nosniff",
+                        f"X-Content-Type-Options: {nosniff or 'missing'}"))
+    for check, name in (("csp", "content-security-policy"),
+                        ("referrer_policy", "referrer-policy"),
+                        ("permissions_policy", "permissions-policy")):
+        out.append(_finding(domain, check, name in headers,
+                            f"{name}: {'present' if name in headers else 'missing'}"))
     return out

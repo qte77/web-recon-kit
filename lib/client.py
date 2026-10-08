@@ -169,6 +169,23 @@ async def get_json(
             return None, None
 
 
+async def get_headers(
+    client: httpx.AsyncClient,
+    throttle: Throttle,
+    base: str,
+    path: str,
+    timeout: int = 20,
+) -> tuple[int | None, dict[str, str]]:
+    """Throttled GET returning (status, lower-cased response headers). The body is not
+    read. (None, {}) on error. Never raises."""
+    async with throttle:
+        try:
+            async with client.stream("GET", base + path, timeout=timeout) as r:
+                return r.status_code, {k.lower(): v for k, v in r.headers.items()}
+        except (httpx.HTTPError, OSError):
+            return None, {}
+
+
 async def get_text(
     client: httpx.AsyncClient,
     throttle: Throttle,
