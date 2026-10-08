@@ -1715,7 +1715,7 @@ wheels = [
 
 [[package]]
 name = "web-recon-kit"
-version = "0.3.1"
+version = "0.3.2"
 source = { virtual = "." }
 dependencies = [
     { name = "httpx" },
