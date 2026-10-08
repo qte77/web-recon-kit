@@ -5,7 +5,7 @@ import re
 from collections import deque
 from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 from html.parser import HTMLParser
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 from lib.types import Endpoint, EndpointSource
 
@@ -41,8 +41,13 @@ def harvest_paths(chunks: Mapping[str, object], prefixes: Sequence[str]) -> list
 
 
 def _on_host(urls: Iterable[str], host: str) -> list[str]:
-    # Reason: same host filter as the browser path's `_harvest_js` (`u.includes(host)`).
-    return list(dict.fromkeys(u for u in urls if host in u))
+    # Reason: exact scheme + netloc match. A substring test (`host in url`, as the browser
+    # path's in-page filter uses) would let `https://<host>.evil.test/` or `?<host>` through,
+    # and here the harness itself issues the GET — the crawl must never leave scope.
+    return list(dict.fromkeys(
+        u for u in urls
+        if (p := urlparse(u)).scheme in ("http", "https") and p.netloc == host
+    ))
 
 
 class _ScriptParser(HTMLParser):

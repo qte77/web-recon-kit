@@ -103,7 +103,13 @@ async def test_crawl_never_fetches_off_host_and_keeps_failed_fetches_empty() -> 
         fetched.append(url)
         return None
 
-    html = '<script src="https://cdn.other.test/x.js"></script><script src="/a.js"></script>'
+    html = (
+        '<script src="https://cdn.other.test/x.js"></script>'
+        # Substring look-alikes of the host must not pass the filter either.
+        '<script src="https://example.test.evil.test/y.js"></script>'
+        '<script src="https://evil.test/z.js?example.test"></script>'
+        '<script src="/a.js"></script>'
+    )
     chunks = await crawl(fetch, html, PAGE, HOST, max_chunks=10)
     assert fetched == ["https://example.test/a.js"]
     assert chunks == {"https://example.test/a.js": ""}
