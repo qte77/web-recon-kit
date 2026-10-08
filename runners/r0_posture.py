@@ -9,6 +9,7 @@ domain names queried. The target gets exactly two throttled GETs per domain
 Domains: `[posture].domains`, default the base_url host minus a leading `www.`.
     uv run python runners/r0_posture.py
 """
+
 from __future__ import annotations
 
 import asyncio

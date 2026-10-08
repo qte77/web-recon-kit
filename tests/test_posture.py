@@ -1,4 +1,5 @@
 """Tests for lib.posture — DoH client fallback + DNS posture checks on fixture answers."""
+
 from collections.abc import Callable, Mapping
 
 import httpx
@@ -128,8 +129,12 @@ def test_two_dmarc_records_fail_and_skip_policy_check() -> None:
 
 @pytest.mark.parametrize(
     ("policy", "minimum", "ok"),
-    [("none", "quarantine", False), ("quarantine", "quarantine", True),
-     ("reject", "quarantine", True), ("quarantine", "reject", False)],
+    [
+        ("none", "quarantine", False),
+        ("quarantine", "quarantine", True),
+        ("reject", "quarantine", True),
+        ("quarantine", "reject", False),
+    ],
 )
 def test_dmarc_policy_level(policy: str, minimum: str, ok: bool) -> None:
     q = _healthy()
@@ -181,9 +186,11 @@ def test_caa_issuers_flagged_only_when_configured_and_extras_accepted() -> None:
 
 @pytest.mark.parametrize(
     ("ds", "ok"),
-    [(_resp(43, "2371 13 2 abcdef", ad=True), True),
-     (_resp(43, "2371 13 2 abcdef", ad=False), False),
-     (_resp(43, ad=True), False)],
+    [
+        (_resp(43, "2371 13 2 abcdef", ad=True), True),
+        (_resp(43, "2371 13 2 abcdef", ad=False), False),
+        (_resp(43, ad=True), False),
+    ],
 )
 def test_dnssec_requires_ds_and_validated_answer(ds: DohResponse, ok: bool) -> None:
     q = _healthy()
@@ -265,14 +272,24 @@ _GOOD_HEADERS = {
     "referrer-policy": "strict-origin-when-cross-origin",
     "permissions-policy": "camera=()",
 }
-_REDIRECT: GetResult = {"status": 301, "content_type": "", "body": "",
-                        "location": "https://example.test/"}
+_REDIRECT: GetResult = {
+    "status": 301,
+    "content_type": "",
+    "body": "",
+    "location": "https://example.test/",
+}
 
 
 def test_good_headers_and_redirect_pass() -> None:
     findings = check_headers(D, _cfg(), 200, _GOOD_HEADERS, _REDIRECT)
     assert {f["check"] for f in findings} == {
-        "https_redirect", "hsts", "csp", "nosniff", "referrer_policy", "permissions_policy"}
+        "https_redirect",
+        "hsts",
+        "csp",
+        "nosniff",
+        "referrer_policy",
+        "permissions_policy",
+    }
     assert all(f["ok"] for f in findings), findings
 
 
@@ -284,8 +301,12 @@ def test_missing_headers_fail() -> None:
 
 @pytest.mark.parametrize(
     ("hsts", "ok"),
-    [("max-age=300", False), ("max-age=15552000", True), ('max-age="31536000"', True),
-     ("includeSubDomains", False)],
+    [
+        ("max-age=300", False),
+        ("max-age=15552000", True),
+        ('max-age="31536000"', True),
+        ("includeSubDomains", False),
+    ],
 )
 def test_hsts_max_age_threshold(hsts: str, ok: bool) -> None:
     headers = {**_GOOD_HEADERS, "strict-transport-security": hsts}
@@ -294,9 +315,13 @@ def test_hsts_max_age_threshold(hsts: str, ok: bool) -> None:
 
 @pytest.mark.parametrize(
     ("status", "location", "ok"),
-    [(301, "https://example.test/", True), (308, "https://example.test/", True),
-     (302, "https://example.test/", False), (200, "", False),
-     (301, "http://example.test/x", False)],
+    [
+        (301, "https://example.test/", True),
+        (308, "https://example.test/", True),
+        (302, "https://example.test/", False),
+        (200, "", False),
+        (301, "http://example.test/x", False),
+    ],
 )
 def test_http_must_permanently_redirect_to_https(status: int, location: str, ok: bool) -> None:
     http: GetResult = {"status": status, "content_type": "", "body": "", "location": location}

@@ -1,4 +1,5 @@
 """Pure JS-bundle path-mining logic for inventory/build_inventory.py (mypy --strict clean)."""
+
 from __future__ import annotations
 
 import re
@@ -33,21 +34,25 @@ def harvest_paths(chunks: Mapping[str, object], prefixes: Sequence[str]) -> list
     if not prefixes:
         return []
     pattern = path_pattern(prefixes)
-    return sorted({
-        m.rstrip("/")
-        for text in chunks.values() if isinstance(text, str)
-        for m in pattern.findall(text)
-    })
+    return sorted(
+        {
+            m.rstrip("/")
+            for text in chunks.values()
+            if isinstance(text, str)
+            for m in pattern.findall(text)
+        }
+    )
 
 
 def _on_host(urls: Iterable[str], host: str) -> list[str]:
     # Reason: exact scheme + netloc match. A substring test (`host in url`, as the browser
     # path's in-page filter uses) would let `https://<host>.evil.test/` or `?<host>` through,
     # and here the harness itself issues the GET — the crawl must never leave scope.
-    return list(dict.fromkeys(
-        u for u in urls
-        if (p := urlparse(u)).scheme in ("http", "https") and p.netloc == host
-    ))
+    return list(
+        dict.fromkeys(
+            u for u in urls if (p := urlparse(u)).scheme in ("http", "https") and p.netloc == host
+        )
+    )
 
 
 class _ScriptParser(HTMLParser):
@@ -110,6 +115,7 @@ def endpoints(paths: Sequence[str], source: EndpointSource, seeds: Sequence[str]
     out: list[Endpoint] = [{"path": p, "module": module_of(p), "source": source} for p in paths]
     out += [
         {"path": s, "module": module_of(s), "source": "seed"}
-        for s in dict.fromkeys(seeds) if s not in mined
+        for s in dict.fromkeys(seeds)
+        if s not in mined
     ]
     return out

@@ -10,6 +10,7 @@ API tier (`--no-browser`): fetches the entry HTML and follows code-split JS chun
 with plain throttled GETs (on-host only, capped):
     uv run python inventory/build_inventory.py --no-browser
 """
+
 from __future__ import annotations
 
 import argparse
@@ -88,8 +89,11 @@ async def static_chunks(scope: Scope, base: str, host: str) -> dict[str, str]:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--no-browser", action="store_true",
-                    help="static crawl of code-split JS chunks over plain GETs (API tier)")
+    ap.add_argument(
+        "--no-browser",
+        action="store_true",
+        help="static crawl of code-split JS chunks over plain GETs (API tier)",
+    )
     args = ap.parse_args()
 
     scope = load_scope()
@@ -97,8 +101,9 @@ def main() -> None:
     host = target_host(scope)
     prefixes = inventory_prefixes(scope)
     source: EndpointSource = "static-crawl" if args.no_browser else "browser"
-    chunks = (asyncio.run(static_chunks(scope, base, host)) if args.no_browser
-              else browser_chunks(base))
+    chunks = (
+        asyncio.run(static_chunks(scope, base, host)) if args.no_browser else browser_chunks(base)
+    )
 
     paths = harvest_paths(chunks, prefixes)
     n_files = sum(1 for t in chunks.values() if isinstance(t, str) and t)

@@ -3,6 +3,7 @@
 Flags unauthenticated 200s on non-public paths (info exposure). Read-only.
     uv run python runners/r2_authmatrix.py
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -37,20 +38,32 @@ async def main() -> None:
     rows: list[MatrixRow] = []
 
     async with httpx.AsyncClient(follow_redirects=False) as client:
+
         async def one(path: str, module: str, label: str, token: str | None) -> None:
             r = await get(client, thr, base, path, token)
-            rows.append({"path": path, "module": module, "identity": label,
-                         "status": r["status"], "content_type": r["content_type"],
-                         "public": path in public})
+            rows.append(
+                {
+                    "path": path,
+                    "module": module,
+                    "identity": label,
+                    "status": r["status"],
+                    "content_type": r["content_type"],
+                    "public": path in public,
+                }
+            )
 
-        await asyncio.gather(*[
-            one(ep["path"], ep["module"], label, token)
-            for ep in eps for (label, token) in probes
-        ])
+        await asyncio.gather(
+            *[
+                one(ep["path"], ep["module"], label, token)
+                for ep in eps
+                for (label, token) in probes
+            ]
+        )
 
     out = write_jsonl(scope, "authmatrix.jsonl", rows)
     exposed = sorted(
-        r["path"] for r in rows
+        r["path"]
+        for r in rows
         if r["identity"] == "noauth" and r["status"] == 200 and r["path"] not in public
     )
     print(f"probed {len(eps)} endpoints x {len(probes)} identities = {len(rows)} GETs")

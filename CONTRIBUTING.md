@@ -20,7 +20,8 @@ One audience per file — reference, don't duplicate (estate contract:
 
 ```bash
 make setup          # install dev + test deps (ruff, mypy, pip-audit, pytest)
-make check          # lint + typecheck + test + audit
+make check          # lint (ruff check + format check) + typecheck + test + audit
+make format         # apply ruff format before committing
 make setup-browser  # optional browser tier (polyfetch + chromium)
 make lint-md        # markdownlint-cli2 + lychee --offline, shared qte77/.github configs
 ```

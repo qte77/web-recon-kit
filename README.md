@@ -126,7 +126,8 @@ the repo-root `results/`. See [CLI / env reference](docs/architecture.md#cli--en
 All four run in CI on every PR:
 
 ```bash
-make lint         # ruff  (E,F,I,B,UP,ANN,S,RUF,PTH)
+make lint         # ruff check (E,F,I,B,UP,ANN,S,RUF,PTH) + ruff format --check
+make format       # apply ruff format (not run in CI — CI only checks)
 make typecheck    # mypy --strict
 make test         # pytest + coverage gate (80% over lib/, see pyproject.toml)
 make audit        # pip-audit (SCA)

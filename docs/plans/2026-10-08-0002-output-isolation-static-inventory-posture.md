@@ -46,7 +46,7 @@ parallel lanes are wanted. Commands pre-staged in "Access checklist".
 
 **Key commands:** every `gh`/`git push`: `env -u GH_TOKEN -u GITHUB_TOKEN …`. Gate before
 push: `uv run ruff check . && uv run mypy && uv run pytest --cov && uv run pip-audit`, plus
-`uv run ruff format --check <changed .py>`, `make lint-md` (shared qte77/.github configs, all
+`uv run ruff format --check .` (in CI since the ruff-format PR), `make lint-md` (shared qte77/.github configs, all
 tracked .md), `actionlint`/`zizmor --offline` if a workflow
 changes. Merge agent PRs: `gh pr checks N --watch` until all green, then `gh pr merge N
 --admin --squash --delete-branch`; Dependabot PRs too (owner, 2026-10-08: always `--admin

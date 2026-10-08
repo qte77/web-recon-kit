@@ -1,4 +1,5 @@
 """Pure resource-id extraction for runners/r3_bola.py (mypy --strict clean)."""
+
 from __future__ import annotations
 
 

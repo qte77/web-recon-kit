@@ -4,6 +4,7 @@ any 200 is a privilege-escalation candidate (member reaching an owner-only surfa
 Requires identity `lowrole` (a member token in workspace A). Read-only GETs.
     uv run python runners/r3_rbac_bfla.py
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -32,8 +33,9 @@ async def main() -> None:
     ids = identities(scope)
     owner, low = ids.get("owner"), ids.get("lowrole")
     if not low or not low["available"]:
-        print("SKIP r3_rbac_bfla: needs a `lowrole` member token "
-              "(identity 'lowrole' in scope.toml).")
+        print(
+            "SKIP r3_rbac_bfla: needs a `lowrole` member token (identity 'lowrole' in scope.toml)."
+        )
         return
 
     eps = [e for e in load_endpoints(scope) if e["path"].startswith(tuple(admin_prefixes(scope)))]
@@ -47,12 +49,20 @@ async def main() -> None:
             low_r = await get(client, thr, base, ep["path"], low["token"])
             noauth_r = await get(client, thr, base, ep["path"], None)
             escalation = low_r["status"] == 200
-            rows.append({"path": ep["path"], "owner_status": base_r["status"],
-                         "lowrole_status": low_r["status"], "noauth_status": noauth_r["status"],
-                         "escalation": escalation})
+            rows.append(
+                {
+                    "path": ep["path"],
+                    "owner_status": base_r["status"],
+                    "lowrole_status": low_r["status"],
+                    "noauth_status": noauth_r["status"],
+                    "escalation": escalation,
+                }
+            )
             flag = "  <-- BFLA: member reached admin surface" if escalation else ""
-            print(f"  {ep['path']:<42} owner={base_r['status']} low={low_r['status']} "
-                  f"noauth={noauth_r['status']}{flag}")
+            print(
+                f"  {ep['path']:<42} owner={base_r['status']} low={low_r['status']} "
+                f"noauth={noauth_r['status']}{flag}"
+            )
 
     out = write_jsonl(scope, "bfla.jsonl", rows)
     esc = [r for r in rows if r["escalation"]]

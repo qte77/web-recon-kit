@@ -5,6 +5,7 @@ Browser tier: needs the optional `browser` extra (`uv sync --extra browser`
 + `uv run patchright install chromium`), then:
     uv run python runners/r1_recon.py
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -38,7 +39,7 @@ def classify(route: str, doc_http: int | None, final_url: str) -> str:
     if not redirected:
         return "public" if doc_http == 200 else f"status-{doc_http}"
     if doc_http == 200:
-        return "client-side-gate"   # 200 doc, then JS bounced to /login
+        return "client-side-gate"  # 200 doc, then JS bounced to /login
     return "server-middleware-gate"  # redirected before content
 
 
@@ -57,7 +58,9 @@ def main() -> None:
             set_cookie_headers: list[str] = []
 
             def on_resp(
-                resp: object, route: str = route, ds: dict[str, int | None] = doc_status,
+                resp: object,
+                route: str = route,
+                ds: dict[str, int | None] = doc_status,
                 sc: list[str] = set_cookie_headers,
             ) -> None:
                 url = cast(str, getattr(resp, "url", ""))
@@ -83,11 +86,21 @@ def main() -> None:
             with contextlib.suppress(Exception):
                 page.screenshot(path=str(shots / f"{slug}.png"), full_page=False)
             gate = classify(route, doc_status["code"], final_url)
-            rows.append({"route": route, "doc_http": doc_status["code"],
-                         "final_url": final_url, "gate": gate, "title": title,
-                         "console_errors": console_errors, "cookie_findings": cookie_findings})
-            print(f"  {route:<16} doc={doc_status['code']} -> {final_url:<28} "
-                  f"[{gate}] errs={len(console_errors)} weak-cookies={len(cookie_findings)}")
+            rows.append(
+                {
+                    "route": route,
+                    "doc_http": doc_status["code"],
+                    "final_url": final_url,
+                    "gate": gate,
+                    "title": title,
+                    "console_errors": console_errors,
+                    "cookie_findings": cookie_findings,
+                }
+            )
+            print(
+                f"  {route:<16} doc={doc_status['code']} -> {final_url:<28} "
+                f"[{gate}] errs={len(console_errors)} weak-cookies={len(cookie_findings)}"
+            )
             page.remove_listener("response", on_resp)
 
     out = write_jsonl(scope, "recon.jsonl", rows)

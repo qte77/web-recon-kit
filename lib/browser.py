@@ -1,4 +1,5 @@
 """Import guard for the optional browser tier (polyfetch-scrape + patchright)."""
+
 from __future__ import annotations
 
 import sys
