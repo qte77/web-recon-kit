@@ -7,7 +7,8 @@ exploration behind it is done (see "Source map"). Do not re-map the codebase.
 PRs #59–#63); docs audit #64; released **v0.3.0** (#65, interim manual bump per #25).
 Follow-ups: shared markdown lint #68, report blank lines #69, D6/#66 fix #70, `ruff format`
 adopted #72 (+ blame-ignore #73; CodeQL alerts #1–#3 dismissed as traced false positives),
-released **v0.3.1** (#74). Open decision: posture port-80 semantics (default: unchanged).
+released **v0.3.1** (#74). Port-80 semantics decided (option C: refused =
+pass, timeout/DNS/other = inconclusive `http_probe`) — PR #76.
 Arc 0001 (`docs/plans/0001-housekeeping-and-issue-backlog.md`) is
 CLOSED; its leftovers are rows 8 and D1–D4 below.
 

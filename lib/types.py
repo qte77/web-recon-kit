@@ -147,6 +147,17 @@ class GetResult(TypedDict):
     location: str
 
 
+# Why a GET got no response: "" = it did; "refused" = port closed; "dns" = name didn't
+# resolve; "timeout" = no answer in time; "error" = anything else.
+ProbeFailure = Literal["", "refused", "dns", "timeout", "error"]
+
+
+class ProbeResult(TypedDict):
+    status: int | None
+    location: str
+    failure: ProbeFailure
+
+
 EndpointSource = Literal["browser", "static-crawl", "seed"]
 
 

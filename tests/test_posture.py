@@ -16,7 +16,14 @@ from lib.posture import (
     settings,
     txt_strings,
 )
-from lib.types import DohResponse, GetResult, PostureFinding, PostureSettings, Scope
+from lib.types import (
+    DohResponse,
+    PostureFinding,
+    PostureSettings,
+    ProbeFailure,
+    ProbeResult,
+    Scope,
+)
 
 D = "example.test"
 
@@ -272,12 +279,7 @@ _GOOD_HEADERS = {
     "referrer-policy": "strict-origin-when-cross-origin",
     "permissions-policy": "camera=()",
 }
-_REDIRECT: GetResult = {
-    "status": 301,
-    "content_type": "",
-    "body": "",
-    "location": "https://example.test/",
-}
+_REDIRECT: ProbeResult = {"status": 301, "location": "https://example.test/", "failure": ""}
 
 
 def test_good_headers_and_redirect_pass() -> None:
@@ -324,9 +326,28 @@ def test_hsts_max_age_threshold(hsts: str, ok: bool) -> None:
     ],
 )
 def test_http_must_permanently_redirect_to_https(status: int, location: str, ok: bool) -> None:
-    http: GetResult = {"status": status, "content_type": "", "body": "", "location": location}
+    http: ProbeResult = {"status": status, "location": location, "failure": ""}
     by = _by_check(check_headers(D, _cfg(), 200, _GOOD_HEADERS, http))
     assert by["https_redirect"]["ok"] is ok
+
+
+def test_refused_port_80_passes_redirect_check() -> None:
+    # Nothing listens on 80, so nothing is ever served over plain HTTP.
+    http: ProbeResult = {"status": None, "location": "", "failure": "refused"}
+    by = _by_check(check_headers(D, _cfg(), 200, _GOOD_HEADERS, http))
+    assert by["https_redirect"]["ok"]
+    assert "refused" in by["https_redirect"]["detail"]
+    assert "http_probe" not in by
+
+
+@pytest.mark.parametrize("failure", ["timeout", "dns", "error"])
+def test_silent_port_80_is_inconclusive_not_a_pass(failure: ProbeFailure) -> None:
+    http: ProbeResult = {"status": None, "location": "", "failure": failure}
+    by = _by_check(check_headers(D, _cfg(), 200, _GOOD_HEADERS, http))
+    assert "https_redirect" not in by
+    assert not by["http_probe"]["ok"]
+    assert by["http_probe"]["severity"] == "info"
+    assert failure in by["http_probe"]["detail"]
 
 
 def test_unreachable_https_reports_fetch_failure_instead_of_missing_headers() -> None:

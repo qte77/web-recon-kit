@@ -1,5 +1,7 @@
 """Smoke tests for the assessment harness core (lib.client, runners.r2_cron_auth)."""
 
+import errno
+import socket
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -23,6 +25,7 @@ from lib.client import (
     load_endpoints,
     load_scope,
     output_dir,
+    probe,
     public_ok,
     recon_routes,
     results_dir,
@@ -191,6 +194,45 @@ async def test_get_text_caps_body_bytes() -> None:
         text = await get_text(client, Throttle(2, 0), "https://example.test", "/a.js", 1000)
 
     assert text == "a" * 1000
+
+
+async def test_probe_returns_status_and_location_without_failure() -> None:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(301, headers={"location": "https://example.test/"})
+
+    async with _client(handler) as client:
+        res = await probe(client, Throttle(2, 0), "http://example.test", "/")
+
+    assert res == {"status": 301, "location": "https://example.test/", "failure": ""}
+
+
+# The exception chains below mirror what httpx actually raises (measured 2026-10-08):
+# refused -> ConnectError from ConnectionRefusedError; DNS -> ConnectError from gaierror.
+def _refused(_request: httpx.Request) -> httpx.Response:
+    raise httpx.ConnectError("refused") from ConnectionRefusedError(errno.ECONNREFUSED, "x")
+
+
+def _dns_fail(_request: httpx.Request) -> httpx.Response:
+    raise httpx.ConnectError("dns") from socket.gaierror(socket.EAI_NONAME, "x")
+
+
+def _timeout(_request: httpx.Request) -> httpx.Response:
+    raise httpx.ConnectTimeout("timed out")
+
+
+def _protocol(_request: httpx.Request) -> httpx.Response:
+    raise httpx.RemoteProtocolError("garbage")
+
+
+@pytest.mark.parametrize(
+    ("handler", "failure"),
+    [(_refused, "refused"), (_dns_fail, "dns"), (_timeout, "timeout"), (_protocol, "error")],
+)
+async def test_probe_classifies_failures_and_never_raises(handler: Handler, failure: str) -> None:
+    async with _client(handler) as client:
+        res = await probe(client, Throttle(2, 0), "http://example.test", "/")
+
+    assert res == {"status": None, "location": "", "failure": failure}
 
 
 @pytest.mark.parametrize("handler", [_boom, lambda _r: httpx.Response(404, text="nope")])
