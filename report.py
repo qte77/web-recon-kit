@@ -115,11 +115,13 @@ def main() -> None:
     md: list[str] = ["# web-recon-kit — aggregated results\n"]
     for fn in (section_posture, section_recon, section_authmatrix, section_cron,
                section_bola, section_bfla):
+        before = len(md)
         fn(md)
-        md.append("")
+        if len(md) > before:  # only separate sections that wrote something
+            md.append("")
     out = results_root() / "report.md"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text("\n".join(md) + "\n")
+    out.write_text("\n".join(md).rstrip("\n") + "\n")
     print(f"-> {out}")
 
 
