@@ -64,5 +64,3 @@ each is expanded and briefly defined.
   so its heavy deps never enter this project's lockfile (a polyfetch-scrape contract; see its
   `USING.md`). web-recon-kit no longer uses it — polyfetch is now the optional `browser` extra
   (see [polyfetch integration](polyfetch-integration.md)).
-
-[poly]: https://github.com/qte77/polyfetch-scrape

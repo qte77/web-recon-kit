@@ -22,9 +22,12 @@ One audience per file — reference, don't duplicate (estate contract:
 make setup          # install dev + test deps (ruff, mypy, pip-audit, pytest)
 make check          # lint + typecheck + test + audit
 make setup-browser  # optional browser tier (polyfetch + chromium)
-markdownlint $(git ls-files '*.md')
-lychee --offline $(git ls-files '*.md')
+make lint-md        # markdownlint-cli2 + lychee --offline, shared qte77/.github configs
 ```
+
+`make lint-md` fetches the shared `.markdownlint.jsonc` and `lychee.toml` from
+`qte77/.github` (git-ignored; CI fetches the same files). `.markdownlint-cli2.jsonc` only
+sets the scope: every tracked `*.md` except `changelog.d/`. Rules belong in the shared file.
 
 ## Testing
 
@@ -81,6 +84,6 @@ The **first** release (`v0.1.0`) was tagged manually — `bump-my-version` drive
 ## Pre-merge
 
 1. `make check` clean
-2. `markdownlint` + `lychee --offline` clean
+2. `make lint-md` clean
 3. `changelog.d/` fragment added
 4. Conventional Commits title

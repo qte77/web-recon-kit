@@ -1,0 +1,9 @@
+{
+  // Scope only — the rules come from the shared qte77/.github `.markdownlint.jsonc`,
+  // which CI (and `make lint-md`) downloads; don't add rules here.
+  // Lint every tracked Markdown file, not just the repo root (the CI default glob).
+  "globs": ["**/*.md"],
+  "gitignore": true,
+  // scriv fragments deliberately start with a `### <type>` heading (MD041).
+  "ignores": ["changelog.d/**"]
+}
