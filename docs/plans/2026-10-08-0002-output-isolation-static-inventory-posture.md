@@ -26,7 +26,7 @@ gate → PR → watch all checks → merge → `git switch main && git fetch --p
   (GET/OPTIONS only, throttling, nothing target-specific committed); an ambiguity not
   covered by the slice spec.
 - **At arc end:** run Verification, strike the arc status to "rows 1–7b done", update
-  auto-memory `arc-0001-plan-status.md` to point at this file, report rows 8–9 as the owner
+  auto-memory `arc-status.md` to point at this file, report rows 8–9 as the owner
   sitting.
 
 **The loop (parallel subagents in worktrees):** after row 5 merges, the coordinator launches
