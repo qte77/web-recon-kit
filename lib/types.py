@@ -57,6 +57,7 @@ class BolaCfg(TypedDict):
 
 class InventoryCfg(TypedDict):
     path_prefixes: NotRequired[list[str]]
+    seed_paths: NotRequired[list[str]]
 
 
 class OutputCfg(TypedDict):
@@ -90,9 +91,13 @@ class GetResult(TypedDict):
     location: str
 
 
+EndpointSource = Literal["browser", "static-crawl", "seed"]
+
+
 class Endpoint(TypedDict):
     path: str
     module: str
+    source: EndpointSource
 
 
 class MatrixRow(TypedDict):

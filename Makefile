@@ -5,7 +5,7 @@ ENV ?= ./.env
 PY  := uv run python
 LOADENV := set -a; . $(ENV); set +a
 
-.PHONY: setup setup-browser inventory recon authmatrix cron bola bfla report all lint typecheck test audit check changelog_new changelog_preview changelog_release clean
+.PHONY: setup setup-browser inventory inventory-static recon authmatrix cron bola bfla report all lint typecheck test audit check changelog_new changelog_preview changelog_release clean
 
 setup:               ## install dev + test deps (ruff, mypy, pip-audit, pytest) — default group
 	uv sync
@@ -16,6 +16,9 @@ setup-browser:       ## install the browser tier: polyfetch (from GitHub) + chro
 
 inventory:           ## (re)mine the API surface from JS bundles  [needs: make setup-browser]
 	$(PY) inventory/build_inventory.py
+
+inventory-static:    ## (re)mine the API surface by crawling code-split JS chunks (no browser)
+	$(PY) inventory/build_inventory.py --no-browser
 
 recon:               ## render routes, classify gates, screenshot  [needs: make setup-browser]
 	$(PY) runners/r1_recon.py

@@ -14,7 +14,9 @@ and drive headless Chromium through the `session.page` handle it yields:
   in-page JS to fetch every same-host `*.js` bundle and greps them for string literals
   under the configured `[inventory].path_prefixes` (default `/api/`), producing
   `inventory/api_endpoints.json`. This is static analysis of code the target already
-  ships to browsers — **no API key required**.
+  ships to browsers — **no API key required**. `--no-browser` (`make inventory-static`)
+  does the same without polyfetch: plain throttled GETs of the entry HTML and the
+  on-host code-split chunks it references (see the [README](../README.md#two-run-tiers)).
 - **`runners/r1_recon.py` — gate classification + screenshots.** Renders each route in
   `[recon].routes`, watches the document response, follows client-side redirects, records
   each route's `console_errors` (error-level console messages + uncaught page errors,
@@ -73,6 +75,8 @@ breakage is caught before an engagement without slowing the normal PR path down 
 Chromium download on every push.
 The import itself goes through `lib.browser.require_render_session()`: on musllinux (e.g.
 Alpine), or simply before `make setup-browser` has run, both browser-tier runners exit 2
+(`build_inventory.py` only in browser mode — it resolves the import lazily so
+`--no-browser` never needs the extra)
 with an actionable hint (install command + the musllinux caveat) instead of a raw
 `ImportError` — run on a glibc host, or install the extra, and re-run.
 

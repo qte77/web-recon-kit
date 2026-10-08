@@ -43,7 +43,7 @@ scope.toml                  # your target's base_url, identities, rate/safety, r
                              #   public-ok list, admin prefixes, BOLA collectors — git-ignored
 lib/                         # typed shared core: config, throttle, async client, scope accessors
 inventory/
-  build_inventory.py        # (re)mine API paths from JS bundles, [inventory].path_prefixes  [browser tier]
+  build_inventory.py        # (re)mine API paths from JS bundles, [inventory].path_prefixes  [browser; --no-browser = API tier]
   api_endpoints.json        # generated inventory — git-ignored
 runners/
   r1_recon.py               # (1) render + gate classification + screenshots  [browser]
@@ -64,6 +64,11 @@ workflow/verify_findings.workflow.js  # agentic adversarial verification (option
   Chromium binary; API-tier users can skip it. Without the extra (or on musllinux, where it's
   unavailable), both browser-tier runners exit 2 with an install hint instead of a raw
   `ImportError`.
+- **No browser?** `make inventory-static` (`build_inventory.py --no-browser`) builds the
+  inventory on the API tier: it fetches the entry HTML and follows its code-split JS chunks
+  (`<script src>`, `modulepreload`, `import("./x.js")`) with plain throttled GETs — on-host
+  only, capped at 100 chunks × 2 MB. Chunks loaded only after client-side navigation or
+  login stay invisible to both modes; add them via `[inventory].seed_paths`.
 
 [poly]: https://github.com/qte77/polyfetch-scrape
 
@@ -83,6 +88,7 @@ make setup-browser                 # (optional) browser tier: polyfetch (GitHub)
 
 ```bash
 make inventory        # refresh the endpoint inventory (browser tier)
+make inventory-static # same, without a browser (static crawl of code-split JS chunks)
 make authmatrix       # (2) auth posture over all endpoints
 make cron             # (2) cron auth posture
 make bola             # (3) cross-tenant — skips cleanly if the tenant_b identity is unset
