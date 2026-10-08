@@ -58,6 +58,7 @@ scope.toml ──┐
 | `[[bola.collectors]]` | list-endpoint → by-id probe templates for r3_bola (`collection_key` may be dotted; optional `id_field`, default `id`) |
 | `[inventory]` `path_prefixes` | literal path prefixes mined from JS bundles (default `["/api/"]`) |
 | `[inventory]` `seed_paths` | known paths appended to the inventory (`source: "seed"`) in both modes |
+| `[posture]` `domains` / `doh_urls` / `mail_profile` / `dmarc_min_policy` / `require_caa` / `require_dnssec` / `caa_issuers` / `caa_extra_issuers` | r0_posture expectations (defaults in `scope.example.toml`) |
 | `[output]` `dir` | where `results/` + `inventory/` are written (default: the scope file's directory; relative values resolve against it) |
 
 ## CLI / env reference
@@ -82,5 +83,8 @@ scope.toml ──┐
 - Cron/mutation endpoints are never triggered; the cron POST-with-invalid-secret test
   is a deliberate, gated manual step.
 - Per-host spacing keeps load far below any DoS threshold.
+- `r0_posture` is passive: DNS answers come from public DoH resolvers (`[posture].doh_urls`),
+  never the target — but those resolver operators see every domain name queried. A failed
+  lookup is reported as `dns_lookup`, never as a missing record.
 - `results/`, `scope.toml`, `scope.*.toml` (except `scope.example.toml`), and
   `inventory/api_endpoints.json` are git-ignored at any depth.
