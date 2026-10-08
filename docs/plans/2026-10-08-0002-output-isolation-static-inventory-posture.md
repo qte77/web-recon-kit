@@ -5,6 +5,9 @@ exploration behind it is done (see "Source map"). Do not re-map the codebase.
 
 **Status (2026-10-08, end of run):** rows 1–7b done and merged (#54, #58, #53, #57,
 PRs #59–#63); docs audit #64; released **v0.3.0** (#65, interim manual bump per #25).
+Follow-ups: shared markdown lint #68, report blank lines #69, D6/#66 fix #70, `ruff format`
+adopted #72 (+ blame-ignore #73; CodeQL alerts #1–#3 dismissed as traced false positives),
+released **v0.3.1** (#74). Open decision: posture port-80 semantics (default: unchanged).
 Arc 0001 (`docs/plans/0001-housekeeping-and-issue-backlog.md`) is
 CLOSED; its leftovers are rows 8 and D1–D4 below.
 
