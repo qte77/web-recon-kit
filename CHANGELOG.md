@@ -16,6 +16,28 @@ Types of changes:
 
 <!-- scriv-insert-here -->
 
+## [0.3.1] - 2026-10-08
+
+### Changed
+
+- Markdown lint uses the shared `qte77/.github` rules locally too (`make lint-md`, same
+  configs CI fetches) and now covers every tracked `*.md` — CI previously linted only the
+  repo root. `.markdownlint-cli2.jsonc` sets the scope; `changelog.d/` is excluded.
+
+- Code style is now `ruff format` (as in sibling qte77 repos): one formatting-only pass
+  (identical ASTs), `ruff format --check .` in CI and `make lint`, `make format` to apply.
+
+### Fixed
+
+- `report.py`: sections with no results no longer leave runs of blank lines in
+  `results/report.md`, which now ends with a single newline (markdownlint-clean).
+
+### Security
+
+- `inventory/build_inventory.py` (browser mode): bundle URLs are kept only on an exact
+  http(s) host match with `base_url`, like the `--no-browser` crawl — the old substring
+  test also accepted look-alike hosts such as `<host>.evil.test` (#66).
+
 ## [0.3.0] - 2026-10-08
 
 ### Added
