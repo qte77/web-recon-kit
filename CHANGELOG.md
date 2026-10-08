@@ -16,6 +16,83 @@ Types of changes:
 
 <!-- scriv-insert-here -->
 
+## [0.3.0] - 2026-10-08
+
+### Added
+
+- `lib/client.py`: `RECON_SCOPE` selects the scope file (default `scope.toml`), relative to
+  the shell's cwd — lets one checkout assess multiple targets without copying files. A
+  missing override file aborts with the resolved path in the error message.
+
+- `inventory/build_inventory.py`: `[inventory].path_prefixes` selects which literal path
+  prefixes get mined from JS bundles (default `/api/`) — targets whose endpoints live under
+  a different prefix no longer get a silently-empty inventory. An empty harvest now warns
+  ("mined 0 endpoints from N JS files — check [inventory].path_prefixes") instead of
+  producing a quietly-clean-looking run. Mining logic moved to the new `lib/inventory.py`.
+
+- `runners/r3_bola.py`: `[[bola.collectors]]` entries accept a dotted `collection_key`
+  (e.g. `data.result.items`) for nested response bodies, and an optional `id_field`
+  (default `id`) for collections keyed on something other than `id`. Extraction logic moved
+  to the new `lib/bola.py`.
+
+- `runners/r1_recon.py`: `results/recon.jsonl` rows now carry per-route `console_errors`
+  (error-level console messages + uncaught page errors, from polyfetch's session capture).
+  Vantage-scoped — reflects only this runner's own headless network. `report.py`'s recon
+  section now also prints the count.
+
+- `lib/cookies.py`, `runners/r1_recon.py`: per-route `cookie_findings` in
+  `results/recon.jsonl` — document-response cookies missing `HttpOnly`/`Secure` or with
+  `SameSite=None`/unset (read from `Set-Cookie` headers, never `page.evaluate`;
+  vantage-scoped like `console_errors`).
+
+- `.github/workflows/browser-tier.yml`: paths-filtered + weekly import smoke of the optional
+  `browser` extra, catching polyfetch API breakage without slowing normal PRs down with a
+  Chromium download on every push.
+
+- `lib/client.py`: `results/` and `inventory/` now live next to the scope file, so
+  `RECON_SCOPE=targets/<name>/scope.toml` keeps each target's outputs separate (default
+  `./scope.toml` → repo root, unchanged). Optional `[output].dir` overrides the location.
+  `load_endpoints`/`write_jsonl` take the scope; `write_jsonl` creates nested dirs;
+  `r1_recon`, `build_inventory` and `report.py` follow the same location (#41).
+
+- `inventory/build_inventory.py --no-browser` (`make inventory-static`): builds the
+  endpoint inventory without Chromium by fetching the entry HTML and following on-host
+  code-split JS chunks (`<script src>`, `modulepreload`, `import("./x.js")`, `from"./y.js"`,
+  `"/assets/z.js"`) with throttled GETs, capped at 100 chunks × 2 MB (`lib/inventory.py`
+  `crawl`, `lib/client.py` `get_text`). `[inventory].seed_paths` appends known paths in
+  both modes; each endpoint now records `source` (`browser` / `static-crawl` / `seed`).
+  The browser import is now lazy, so `--no-browser` runs without the `browser` extra (#56).
+
+- `runners/r0_posture.py` + `lib/posture.py`: passive DNS posture per domain via public
+  DNS-over-HTTPS (Cloudflare, then Google; `[posture].doh_urls`) — at most one SPF and
+  one DMARC record, DMARC policy level, null MX + `v=spf1 -all` for `mail_profile = "none"`,
+  CAA present (issuers flagged only when `caa_issuers` is set), DS + validated (`AD`)
+  answers when `require_dnssec`. Writes `results/posture.jsonl` (#55).
+
+- `runners/r0_posture.py`: HTTP posture per domain — `http://<d>/` must 301/308 to
+  https, and `https://<d>/` must send HSTS (`max-age` ≥ `[posture].hsts_min_max_age`),
+  CSP, `X-Content-Type-Options: nosniff`, `Referrer-Policy` and `Permissions-Policy`
+  (two GETs, redirects not followed; `lib/client.py` `get_headers`). `report.py` gains a
+  "Posture" section; `make posture` runs it (#55).
+
+### Fixed
+
+- `report.py`: the aggregate `Auth matrix` section no longer lists paths whitelisted in
+  `scope.toml`'s `[authmatrix].public_ok` as findings needing review. `r2_authmatrix.py`
+  already excluded them from its own console output but never persisted that decision into
+  `results/authmatrix.jsonl`, so `report.py` (which has no access to `scope.toml`) recomputed
+  exposure from raw status codes alone and disagreed with the runner's own live output.
+
+- `runners/r1_recon.py`, `inventory/build_inventory.py`: a missing `polyfetch_scrape` now
+  exits 2 with the install command and the musllinux caveat (`lib/browser.py`) instead of a
+  raw `ImportError`.
+
+### Security
+
+- `.gitignore`: ignore `scope.*.toml` (except `scope.example.toml`) and
+  `inventory/api_endpoints.json` at any depth, so per-target scope files and inventories
+  can no longer be committed by accident.
+
 ## [0.2.0] - 2026-07-20
 
 ### Added
