@@ -3,15 +3,17 @@
 **Start here — this file is the complete context for this arc.** Read only this file; the
 exploration behind it is done (see "Source map"). Do not re-map the codebase.
 
-**Status (2026-10-08):** planned, owner-approved scope; only row 3 done (this doc, PR #57).
-Start with row 1. Arc 0001 (`docs/plans/0001-housekeeping-and-issue-backlog.md`) is
-CLOSED in the same PR that adds this file; its leftovers are rows 8 and D1–D4 below.
+**Status (2026-10-08, end of run):** rows 1–7b done. Rows 1–3 merged (#54, #58, #53, #57).
+Rows 4–7b are **open, green-gated PRs stacked in order #59 → #60 → #61 → #62 → #63**: the
+auto-mode classifier denies `gh pr merge --admin` on agent-authored PRs (it allowed the
+Dependabot ones), so they await the owner. Arc 0001
+(`docs/plans/0001-housekeeping-and-issue-backlog.md`) is CLOSED; its leftovers are rows 8
+and D1–D4 below.
 
-**Next, in order:** (1) re-verify live state (drift happened after every gap: open PRs
-#52/#53/#54, alert #8, issues #41/#55/#56, `git status`/`git branch` clean `main`);
-(2) Lane 0 rows 1–4 serially from the coordinator; (3) row 5 (#41) — it is the shared
-foundation; (4) then Lane A (#56, row 6) **∥** Lane B (#55, rows 7a→7b) in parallel worktrees;
-(5) owner sitting for rows 8–9; (6) arc close-out audit.
+**Next, in order:** (1) owner merges #59…#63 in order with `--admin --squash` (each later
+PR needs `update-branch` once the one below lands — squash rewrites the base); (2) close-out
+check: #41/#55/#56 closed by the merges (#55 closes via #63); (3) owner sitting for rows
+8–9; (4) arc close-out audit (Verification below).
 
 **Unattended run contract (owner-approved 2026-10-08):** execute rows 1 → 7b end to end
 with no check-ins. Each row: branch (`chore/…`, `fix/…`, `feat/…`), RED → GREEN → docs →
@@ -91,7 +93,7 @@ Cloudflare → Google, overridable list; keep #56/#55 as specced; full plan doc.
 | 5 | ~~#41 per-scope output dir~~ ([PR #60](https://github.com/qte77/web-recon-kit/pull/60)) | 0 | agent | tests + dry run (two scope dirs → separate outputs, root untouched); `Closes #41` |
 | 6 | ~~#56 `--no-browser` static crawl~~ ([PR #61](https://github.com/qte77/web-recon-kit/pull/61)) | A | agent | non-empty inventory from code-split fixture, chunk cap tested; `Closes #56` |
 | 7a | ~~#55 DoH client + DNS checks~~ ([PR #62](https://github.com/qte77/web-recon-kit/pull/62)) | B | agent | fixture tests incl. fallback + split TXT; `Refs #55` |
-| 7b | #55 headers + report section + `make posture` | B | agent | fixture tests; report section; `Closes #55` |
+| 7b | ~~#55 headers + report section + `make posture`~~ (PR #TBD) | B | agent | fixture tests; report section; `Closes #55` |
 | 8 | (from 0001 row 16) browser-tier e2e of `console_errors`/`cookie_findings` | — | owner | real-target rows show both fields |
 | 9 | Real-target e2e of #41/#56/#55 | — | owner | outputs per target dir; non-empty static inventory; `posture.jsonl` |
 | D1 | #21-3 network log | — | deferred | upstream polyfetch-scrape#182 (open) |
@@ -99,6 +101,7 @@ Cloudflare → Google, overridable list; keep #56/#55 as specced; full plan doc.
 | D3 | #31 CDP fallback | — | deferred | YAGNI |
 | D4 | #25 automated release | — | deferred | upstream qte77/.github#38 (open) |
 | D5 | DoH wire format (RFC 8484, e.g. Quad9) | — | deferred | YAGNI; needs a binary DNS parser |
+| D6 | Browser-path `_harvest_js` host filter is a substring test (`u.includes(host)`) — look-alike hosts pass; static crawl (row 6) already uses exact netloc | — | deferred | new finding 2026-10-08 (security review of row 6); fix = same exact-origin check in the JS |
 
 ## Slice specs (HOW — the table above is WHAT)
 

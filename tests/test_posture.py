@@ -4,17 +4,18 @@ from collections.abc import Callable, Mapping
 import httpx
 import pytest
 
-from lib.client import Throttle
+from lib.client import Throttle, get_headers
 from lib.posture import (
     CF_DOH,
     GOOGLE_DOH,
     check_dns,
+    check_headers,
     doh_query,
     parse_caa,
     settings,
     txt_strings,
 )
-from lib.types import DohResponse, PostureFinding, PostureSettings, Scope
+from lib.types import DohResponse, GetResult, PostureFinding, PostureSettings, Scope
 
 D = "example.test"
 
@@ -253,6 +254,76 @@ async def test_doh_nxdomain_is_an_answer_not_a_fallback() -> None:
     res, hosts = await _query(lambda _r: httpx.Response(200, json=nx))
     assert res == nx
     assert hosts == ["cloudflare-dns.com"]
+
+
+# --- HTTP header checks (7b) -------------------------------------------------------
+
+_GOOD_HEADERS = {
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-security-policy": "default-src 'self'",
+    "x-content-type-options": "nosniff",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "permissions-policy": "camera=()",
+}
+_REDIRECT: GetResult = {"status": 301, "content_type": "", "body": "",
+                        "location": "https://example.test/"}
+
+
+def test_good_headers_and_redirect_pass() -> None:
+    findings = check_headers(D, _cfg(), 200, _GOOD_HEADERS, _REDIRECT)
+    assert {f["check"] for f in findings} == {
+        "https_redirect", "hsts", "csp", "nosniff", "referrer_policy", "permissions_policy"}
+    assert all(f["ok"] for f in findings), findings
+
+
+def test_missing_headers_fail() -> None:
+    by = _by_check(check_headers(D, _cfg(), 200, {"x-content-type-options": "off"}, _REDIRECT))
+    for check in ("hsts", "csp", "nosniff", "referrer_policy", "permissions_policy"):
+        assert not by[check]["ok"], check
+
+
+@pytest.mark.parametrize(
+    ("hsts", "ok"),
+    [("max-age=300", False), ("max-age=15552000", True), ('max-age="31536000"', True),
+     ("includeSubDomains", False)],
+)
+def test_hsts_max_age_threshold(hsts: str, ok: bool) -> None:
+    headers = {**_GOOD_HEADERS, "strict-transport-security": hsts}
+    assert _by_check(check_headers(D, _cfg(), 200, headers, _REDIRECT))["hsts"]["ok"] is ok
+
+
+@pytest.mark.parametrize(
+    ("status", "location", "ok"),
+    [(301, "https://example.test/", True), (308, "https://example.test/", True),
+     (302, "https://example.test/", False), (200, "", False),
+     (301, "http://example.test/x", False)],
+)
+def test_http_must_permanently_redirect_to_https(status: int, location: str, ok: bool) -> None:
+    http: GetResult = {"status": status, "content_type": "", "body": "", "location": location}
+    by = _by_check(check_headers(D, _cfg(), 200, _GOOD_HEADERS, http))
+    assert by["https_redirect"]["ok"] is ok
+
+
+def test_unreachable_https_reports_fetch_failure_instead_of_missing_headers() -> None:
+    by = _by_check(check_headers(D, _cfg(), None, {}, _REDIRECT))
+    assert not by["headers_fetch"]["ok"]
+    assert "hsts" not in by
+
+
+async def test_get_headers_lowercases_and_never_raises() -> None:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, headers={"Strict-Transport-Security": "max-age=1"})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        status, headers = await get_headers(client, Throttle(1, 0), "https://example.test", "/")
+    assert status == 200
+    assert headers["strict-transport-security"] == "max-age=1"
+
+    def boom(_request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("refused")
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(boom)) as client:
+        assert await get_headers(client, Throttle(1, 0), "https://example.test", "/") == (None, {})
 
 
 async def test_doh_all_resolvers_failing_returns_none() -> None:

@@ -70,6 +70,7 @@ mail_profile = "send"
 dmarc_min_policy = "quarantine"   # none | quarantine | reject
 require_caa = true
 require_dnssec = false            # true = DS present + resolver-validated (AD)
+hsts_min_max_age = 15552000       # seconds (180 days)
 # caa_issuers = ["letsencrypt.org"]   # set to flag any other issuer
 # caa_extra_issuers = []              # CDN-added issuers to accept, not flag
 
