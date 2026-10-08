@@ -3,8 +3,8 @@
 **Start here — this file is the complete context for this arc.** Read only this file; the
 exploration behind it is done (see "Source map"). Do not re-map the codebase.
 
-**Status (2026-10-08):** planned, owner-approved scope; nothing executed yet except
-committing this doc. Arc 0001 (`docs/plans/0001-housekeeping-and-issue-backlog.md`) is
+**Status (2026-10-08):** planned, owner-approved scope; only row 3 done (this doc, PR #57).
+Start with row 1. Arc 0001 (`docs/plans/0001-housekeeping-and-issue-backlog.md`) is
 CLOSED in the same PR that adds this file; its leftovers are rows 8 and D1–D4 below.
 
 **Next, in order:** (1) re-verify live state (drift happened after every gap: open PRs
@@ -12,6 +12,23 @@ CLOSED in the same PR that adds this file; its leftovers are rows 8 and D1–D4 
 (2) Lane 0 rows 1–4 serially from the coordinator; (3) row 5 (#41) — it is the shared
 foundation; (4) then Lane A (#56, row 6) **∥** Lane B (#55, rows 7a→7b) in parallel worktrees;
 (5) owner sitting for rows 8–9; (6) arc close-out audit.
+
+**Unattended run contract (owner-approved 2026-10-08):** execute rows 1 → 7b end to end
+with no check-ins. Each row: branch (`chore/…`, `fix/…`, `feat/…`), RED → GREEN → docs →
+fragment → strike own row (PR number via a follow-up commit on the same branch) → full
+gate → PR → watch all checks → merge → `git switch main && git fetch --prune && git merge
+--ff-only origin/main` → one-line progress note (shipped · next · % · blocked).
+- **Decide-by-default on drift:** a row already done by someone else → verify, strike it with
+  the actual PR/evidence, continue. A new Dependabot PR → merge it like rows 1–2 if green.
+  New issues → add a deferred row, don't implement.
+- **Stop and report only on:** a gate that would need relaxing; a check failing for a
+  reason not caused by the slice that persists after one update-branch; a merge blocked
+  by a rule even with `--admin`; any change that would weaken an AGENTS.md guardrail
+  (GET/OPTIONS only, throttling, nothing target-specific committed); an ambiguity not
+  covered by the slice spec.
+- **At arc end:** run Verification, strike the arc status to "rows 1–7b done", update
+  auto-memory `arc-0001-plan-status.md` to point at this file, report rows 8–9 as the owner
+  sitting.
 
 **The loop (parallel subagents in worktrees):** after row 5 merges, the coordinator launches
 one fresh `general-purpose` agent per lane with `isolation: "worktree"`, each briefed to
@@ -68,7 +85,7 @@ Cloudflare → Google, overridable list; keep #56/#55 as specced; full plan doc.
 | --- | --- | --- | --- | --- |
 | 1 | Merge #54 (urllib3, alert #8) | 0 | agent | merged; 0 open alerts |
 | 2 | Merge #52, #53 | 0 | agent | merged; 0 open Dependabot PRs |
-| 3 | Close 0001 in place (CLOSED banner, row 7 DONE w/ #52–#54) + add this doc + roadmap link | 0 | agent | PR merged |
+| 3 | Close 0001 in place (CLOSED banner, row 7 DONE w/ #52–#54) + add this doc + roadmap link | 0 | agent | DONE — [PR #57](https://github.com/qte77/web-recon-kit/pull/57) |
 | 4 | `.gitignore`: `scope.*.toml` + `!scope.example.toml`, `**/inventory/api_endpoints.json` | 0 | agent | `git check-ignore` ignores `scope.acme.toml`, `targets/x/scope.toml`, `targets/x/inventory/api_endpoints.json`, `targets/x/results/a.jsonl`; NOT `scope.example.toml` |
 | 5 | #41 per-scope output dir | 0 | agent | tests + dry run (two scope dirs → separate outputs, root untouched); `Closes #41` |
 | 6 | #56 `--no-browser` static crawl | A | agent | non-empty inventory from code-split fixture, chunk cap tested; `Closes #56` |
