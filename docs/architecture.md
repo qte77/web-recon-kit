@@ -65,7 +65,7 @@ scope.toml ──┐
 
 | Knob | Where | Effect |
 |---|---|---|
-| `make <target>` | Makefile | `setup setup-browser inventory inventory-static posture recon authmatrix cron bola bfla report all lint lint-md typecheck test audit check changelog_new changelog_preview changelog_release clean` |
+| `make <target>` | Makefile | `setup setup-browser inventory inventory-static posture recon authmatrix cron bola bfla report all lint format lint-md typecheck test audit check changelog_new changelog_preview changelog_release clean` |
 | `ENV=/path/.env` | make var | env file sourced for tokens |
 | `RECON_SCOPE=/path/scope.toml` | env (any runner) | scope file instead of `./scope.toml`; relative to the shell cwd; a missing file aborts naming the resolved path; also selects the output location (see `[output]`) |
 | `--no-browser` | `build_inventory.py` (= `make inventory-static`) | static crawl of code-split JS chunks over plain GETs instead of Chromium; no `browser` extra needed |
