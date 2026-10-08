@@ -24,6 +24,12 @@ Delivery history + direction. Open work is tracked as GitHub issues.
 - Browser-tier import smoke (`.github/workflows/browser-tier.yml`), paths-filtered +
   weekly, so polyfetch API breakage is caught early without slowing the normal PR gate
   ([#13](https://github.com/qte77/web-recon-kit/issues/13)).
+- Multi-target runs: outputs live next to each scope file, `[output].dir` overrides
+  ([#41](https://github.com/qte77/web-recon-kit/issues/41)).
+- Browser-free inventory: `build_inventory.py --no-browser` follows code-split JS chunks
+  ([#56](https://github.com/qte77/web-recon-kit/issues/56)).
+- Passive posture runner `r0_posture`: DNS via DoH (SPF/DMARC/null MX/CAA/DNSSEC) + HTTP
+  security headers ([#55](https://github.com/qte77/web-recon-kit/issues/55)).
 
 ## Direction
 
