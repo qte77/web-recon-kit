@@ -38,16 +38,21 @@ from lib.inventory import MAX_CHUNK_BYTES, MAX_CHUNKS, crawl, endpoints, harvest
 from lib.types import Endpoint, EndpointSource, Scope  # noqa: E402
 
 
-def _harvest_js(host: str) -> str:
+def _harvest_js(base: str) -> str:
+    # Reason: exact http(s) host match, as lib.inventory._on_host does for --no-browser —
+    # a substring test would let `<host>.evil.test` or `?<host>` URLs through.
     return f"""
 async () => {{
+  const want = new URL({base!r}).host;
   const urls = new Set();
   document.querySelectorAll('script[src]').forEach(s => urls.add(s.src));
   performance.getEntriesByType('resource').filter(e => e.name.endsWith('.js'))
     .forEach(e => urls.add(e.name));
   const out = {{}};
   for (const u of urls) {{
-    if (!u.includes({host!r})) continue;
+    let p;
+    try {{ p = new URL(u); }} catch (e) {{ continue; }}
+    if (!['http:', 'https:'].includes(p.protocol) || p.host !== want) continue;
     try {{ out[u] = await (await fetch(u)).text(); }} catch (e) {{ out[u] = ''; }}
   }}
   return out;
@@ -55,7 +60,7 @@ async () => {{
 """
 
 
-def browser_chunks(base: str, host: str) -> dict[str, str]:
+def browser_chunks(base: str) -> dict[str, str]:
     # Reason: imported here so --no-browser runs without the browser extra installed.
     from lib.browser import require_render_session
 
@@ -64,7 +69,7 @@ def browser_chunks(base: str, host: str) -> dict[str, str]:
         page = session.page
         with contextlib.suppress(Exception):
             page.goto(base + "/", wait_until="networkidle", timeout=30000)
-        return cast("dict[str, str]", page.evaluate(_harvest_js(host)) or {})
+        return cast("dict[str, str]", page.evaluate(_harvest_js(base)) or {})
 
 
 async def static_chunks(scope: Scope, base: str, host: str) -> dict[str, str]:
@@ -93,7 +98,7 @@ def main() -> None:
     prefixes = inventory_prefixes(scope)
     source: EndpointSource = "static-crawl" if args.no_browser else "browser"
     chunks = (asyncio.run(static_chunks(scope, base, host)) if args.no_browser
-              else browser_chunks(base, host))
+              else browser_chunks(base))
 
     paths = harvest_paths(chunks, prefixes)
     n_files = sum(1 for t in chunks.values() if isinstance(t, str) and t)

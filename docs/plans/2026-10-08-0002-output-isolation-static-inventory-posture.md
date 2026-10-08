@@ -101,7 +101,7 @@ Cloudflare → Google, overridable list; keep #56/#55 as specced; full plan doc.
 | D3 | #31 CDP fallback | — | deferred | YAGNI |
 | D4 | #25 automated release | — | deferred | upstream qte77/.github#38 (open) |
 | D5 | DoH wire format (RFC 8484, e.g. Quad9) | — | deferred | YAGNI; needs a binary DNS parser |
-| D6 | Browser-path `_harvest_js` host filter is a substring test (`u.includes(host)`) — look-alike hosts pass; static crawl (row 6) already uses exact netloc | — | deferred | [#66](https://github.com/qte77/web-recon-kit/issues/66) (low; security review of row 6); fix = same exact-origin check in the JS |
+| D6 | ~~Browser-path `_harvest_js` host filter is a substring test (`u.includes(host)`) — look-alike hosts pass; static crawl (row 6) already uses exact netloc~~ | — | agent | DONE — [#66](https://github.com/qte77/web-recon-kit/issues/66) fixed in PR #TBD (exact http(s) host match in the JS; Node-harness proof) |
 
 ## Slice specs (HOW — the table above is WHAT)
 
