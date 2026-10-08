@@ -16,6 +16,19 @@ Types of changes:
 
 <!-- scriv-insert-here -->
 
+## [0.3.2] - 2026-10-08
+
+### Fixed
+
+- `r0_posture`: a silent `http://<d>/` no longer counts as a pass. A refused connection
+  still passes the redirect check (port 80 closed); a timeout, DNS or other failure is now
+  an inconclusive `http_probe` finding (`info`). `lib/client.py` `probe()` reports why a
+  GET got no response.
+
+- `make lint-md`: only existing `.md` files go to lychee. A tracked file deleted but not
+  yet staged (e.g. fragments `scriv collect` just removed) was read as a URL and crashed
+  the offline link check; untracked, non-ignored `.md` files are now checked too.
+
 ## [0.3.1] - 2026-10-08
 
 ### Changed
