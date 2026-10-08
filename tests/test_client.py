@@ -15,6 +15,7 @@ from lib.client import (
     cron_prefix,
     get,
     get_json,
+    get_text,
     identities,
     inventory_file,
     inventory_prefixes,
@@ -179,6 +180,24 @@ async def test_get_json_captures_transport_error_instead_of_raising() -> None:
 
     assert status is None
     assert data is None
+
+
+async def test_get_text_caps_body_bytes() -> None:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, content=b"a" * 5000)
+
+    async with _client(handler) as client:
+        text = await get_text(client, Throttle(2, 0), "https://example.test", "/a.js", 1000)
+
+    assert text == "a" * 1000
+
+
+@pytest.mark.parametrize("handler", [_boom, lambda _r: httpx.Response(404, text="nope")])
+async def test_get_text_returns_none_on_error_or_non_200(handler: Handler) -> None:
+    async with _client(handler) as client:
+        text = await get_text(client, Throttle(2, 0), "https://example.test", "/a.js", 1000)
+
+    assert text is None
 
 
 # --- RECON_SCOPE override -------------------------------------------------------

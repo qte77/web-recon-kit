@@ -81,6 +81,12 @@ def inventory_prefixes(scope: Scope) -> tuple[str, ...]:
     return tuple(prefixes) if prefixes is not None else ("/api/",)
 
 
+def seed_paths(scope: Scope) -> list[str]:
+    cfg = scope.get("inventory")
+    seeds = cfg.get("seed_paths") if cfg is not None else None
+    return list(seeds) if seeds is not None else []
+
+
 def identities(scope: Scope) -> dict[str, ResolvedIdentity]:
     """Resolve each identity's bearer token from the environment."""
     out: dict[str, ResolvedIdentity] = {}
@@ -161,6 +167,31 @@ async def get_json(
             return r.status_code, data
         except (httpx.HTTPError, OSError):
             return None, None
+
+
+async def get_text(
+    client: httpx.AsyncClient,
+    throttle: Throttle,
+    base: str,
+    path: str,
+    max_bytes: int,
+    timeout: int = 20,
+) -> str | None:
+    """Throttled GET of a text body, reading at most `max_bytes` (streamed, so an
+    oversized body is never fully downloaded). None on non-200 or error. Never raises."""
+    async with throttle:
+        try:
+            async with client.stream("GET", base + path, timeout=timeout) as r:
+                if r.status_code != 200:
+                    return None
+                buf = bytearray()
+                async for part in r.aiter_bytes():
+                    buf += part
+                    if len(buf) >= max_bytes:
+                        break
+                return bytes(buf[:max_bytes]).decode(r.encoding or "utf-8", errors="replace")
+        except (httpx.HTTPError, OSError):
+            return None
 
 
 def output_dir(scope: Scope) -> Path:

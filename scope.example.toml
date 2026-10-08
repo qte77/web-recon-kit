@@ -54,6 +54,9 @@ admin_prefixes = ["/api/admin/"]
 # Literal path prefixes the bundle miner harvests from JS. Keep the trailing
 # slash so "/claim" doesn't match "/claimant". Defaults to ["/api/"] if omitted.
 path_prefixes = ["/api/"]
+# Known paths appended to the inventory (source "seed") when mining misses them —
+# both modes (browser and --no-browser). Optional.
+# seed_paths = ["/api/health"]
 
 # [output]
 # Where results/ and inventory/ are written. Defaults to this scope file's own

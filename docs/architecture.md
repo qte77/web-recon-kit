@@ -12,6 +12,10 @@ environment.
 | **API** | `httpx` (own venv) | r2_authmatrix, r2_cron_auth, r2_schemathesis, r3_bola, r3_rbac_bfla, report | `make setup` |
 | **Browser** | patchright/Chromium via [polyfetch-scrape][poly] | inventory miner, r1_recon | `make setup-browser` |
 
+The inventory miner also runs on the API tier with `--no-browser` (`make inventory-static`):
+a static crawl of the entry HTML's on-host code-split JS chunks (≤ 100 chunks × 2 MB).
+Each endpoint records its `source`: `browser`, `static-crawl`, or `seed`.
+
 The browser tier is an optional `browser` extra so API-tier users never install
 Chromium. See [polyfetch integration](polyfetch-integration.md) for how the runners
 use polyfetch (bundle mining, gate classification, screenshots).
@@ -53,13 +57,14 @@ scope.toml ──┐
 | `[bfla]` `admin_prefixes` | admin/RBAC path prefixes for r3_rbac_bfla |
 | `[[bola.collectors]]` | list-endpoint → by-id probe templates for r3_bola (`collection_key` may be dotted; optional `id_field`, default `id`) |
 | `[inventory]` `path_prefixes` | literal path prefixes mined from JS bundles (default `["/api/"]`) |
+| `[inventory]` `seed_paths` | known paths appended to the inventory (`source: "seed"`) in both modes |
 | `[output]` `dir` | where `results/` + `inventory/` are written (default: the scope file's directory; relative values resolve against it) |
 
 ## CLI / env reference
 
 | Knob | Where | Effect |
 |---|---|---|
-| `make <target>` | Makefile | `setup setup-browser inventory recon authmatrix cron bola bfla report all lint typecheck test audit check changelog_new changelog_preview changelog_release clean` |
+| `make <target>` | Makefile | `setup setup-browser inventory inventory-static recon authmatrix cron bola bfla report all lint typecheck test audit check changelog_new changelog_preview changelog_release clean` |
 | `ENV=/path/.env` | make var | env file sourced for tokens |
 | `RECON_SCOPE=/path/scope.toml` | env (any runner) | scope file instead of `./scope.toml`; relative to the shell cwd; a missing file aborts naming the resolved path; also selects the output location (see `[output]`) |
 | `VERSION=X.Y.Z` | `make changelog_release` | version the scriv fragments are collected under |
