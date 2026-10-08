@@ -1,5 +1,11 @@
 # Arc 0001 — Housekeeping & Prioritized Issue Backlog
 
+> **CLOSED 2026-10-08.** Row 7 is DONE: Dependabot opened #52 (`python-deps`), #53
+> (`github-actions`) and #54 (`python-deps-security`), correctly grouped and labeled under
+> the PR #39 config. Row 16 and D1–D4 were migrated to
+> [arc 0002](2026-10-08-0002-output-isolation-static-inventory-posture.md), which is now
+> the active plan. Kept in place for history; do not resume work from this file.
+
 **Start here — this file is the complete context for this arc.** Read this document only;
 the exploration behind it is already done (see "Source map & verified facts" at the end) —
 do not re-explore the codebase or re-run the GitHub audits before acting.
