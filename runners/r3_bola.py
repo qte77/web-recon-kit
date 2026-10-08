@@ -67,10 +67,10 @@ async def main() -> None:
                 flag = "  <-- CROSS-TENANT LEAK" if leak else ""
                 print(f"  [{kind}] {probe}  owner={own['status']} tenant_b={other['status']}{flag}")
 
-    write_jsonl("bola.jsonl", rows)
+    out = write_jsonl(scope, "bola.jsonl", rows)
     leaks = [r for r in rows if r["leak"]]
     print(f"\n{len(rows)} by-id probes; {len(leaks)} cross-tenant leaks.")
-    print("-> results/bola.jsonl")
+    print(f"-> {out}")
 
 
 if __name__ == "__main__":

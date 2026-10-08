@@ -2,6 +2,7 @@
 
 Only httpx (PEP 561-typed) + stdlib. Read-only GET/OPTIONS by design.
 Scope file: scope.toml at the repo root, or $RECON_SCOPE (relative to cwd).
+Outputs (results/, inventory/) go next to the scope file unless `[output].dir` is set.
 """
 from __future__ import annotations
 
@@ -162,13 +163,30 @@ async def get_json(
             return None, None
 
 
-def load_endpoints() -> list[dict[str, str]]:
-    raw = json.loads((ROOT / "inventory" / "api_endpoints.json").read_text())
+def output_dir(scope: Scope) -> Path:
+    """Where results/ and inventory/ live: the scope file's directory, or
+    `[output].dir` resolved against it (absolute paths used as-is)."""
+    base = scope_path().resolve().parent
+    cfg = scope.get("output")
+    override = cfg.get("dir") if cfg is not None else None
+    return (base / override).resolve() if override else base
+
+
+def results_dir(scope: Scope) -> Path:
+    return output_dir(scope) / "results"
+
+
+def inventory_file(scope: Scope) -> Path:
+    return output_dir(scope) / "inventory" / "api_endpoints.json"
+
+
+def load_endpoints(scope: Scope) -> list[dict[str, str]]:
+    raw = json.loads(inventory_file(scope).read_text())
     return cast("list[dict[str, str]]", raw)
 
 
-def write_jsonl(name: str, rows: Sequence[Mapping[str, object]]) -> Path:
-    out = ROOT / "results" / name
-    out.parent.mkdir(exist_ok=True)
+def write_jsonl(scope: Scope, name: str, rows: Sequence[Mapping[str, object]]) -> Path:
+    out = results_dir(scope) / name
+    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(json.dumps(r) for r in rows) + "\n")
     return out

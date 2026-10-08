@@ -59,6 +59,10 @@ class InventoryCfg(TypedDict):
     path_prefixes: NotRequired[list[str]]
 
 
+class OutputCfg(TypedDict):
+    dir: NotRequired[str]
+
+
 class CookieFinding(TypedDict):
     name: str
     missing_httponly: bool
@@ -76,6 +80,7 @@ class Scope(TypedDict):
     bfla: NotRequired[BflaCfg]
     bola: NotRequired[BolaCfg]
     inventory: NotRequired[InventoryCfg]
+    output: NotRequired[OutputCfg]
 
 
 class GetResult(TypedDict):

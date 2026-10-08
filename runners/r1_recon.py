@@ -8,7 +8,6 @@ Browser tier: needs the optional `browser` extra (`uv sync --extra browser`
 from __future__ import annotations
 
 import contextlib
-import json
 import sys
 from pathlib import Path
 from typing import TypedDict, cast
@@ -17,7 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from lib.browser import require_render_session  # noqa: E402
-from lib.client import load_scope, recon_routes  # noqa: E402
+from lib.client import load_scope, recon_routes, results_dir, write_jsonl  # noqa: E402
 from lib.cookies import audit_set_cookie  # noqa: E402
 from lib.types import CookieFinding  # noqa: E402
 
@@ -47,7 +46,7 @@ def main() -> None:
     scope = load_scope()
     base = scope["base_url"]
     routes = recon_routes(scope)
-    shots = ROOT / "results" / "screens"
+    shots = results_dir(scope) / "screens"
     shots.mkdir(parents=True, exist_ok=True)
     rows: list[ReconRow] = []
 
@@ -91,9 +90,8 @@ def main() -> None:
                   f"[{gate}] errs={len(console_errors)} weak-cookies={len(cookie_findings)}")
             page.remove_listener("response", on_resp)
 
-    out = ROOT / "results" / "recon.jsonl"
-    out.write_text("\n".join(json.dumps(r) for r in rows) + "\n")
-    print(f"\n-> {out}  (+ screenshots in results/screens/)")
+    out = write_jsonl(scope, "recon.jsonl", rows)
+    print(f"\n-> {out}  (+ screenshots in {shots}/)")
 
 
 if __name__ == "__main__":

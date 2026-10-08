@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from lib.browser import require_render_session  # noqa: E402
-from lib.client import inventory_prefixes, load_scope, target_host  # noqa: E402
+from lib.client import inventory_file, inventory_prefixes, load_scope, target_host  # noqa: E402
 from lib.inventory import harvest_paths  # noqa: E402
 from lib.types import Endpoint  # noqa: E402
 
@@ -68,7 +68,8 @@ def main() -> None:
     host = target_host(scope)
     prefixes = inventory_prefixes(scope)
     endpoints = mine(base, host, prefixes)
-    out = ROOT / "inventory" / "api_endpoints.json"
+    out = inventory_file(scope)
+    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(endpoints, indent=2) + "\n")
     print(f"wrote {len(endpoints)} endpoints -> {out}")
 

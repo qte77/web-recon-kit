@@ -24,7 +24,8 @@ use polyfetch (bundle mining, gate classification, screenshots).
   resolution, scope accessors), `types.py` (TypedDict schemas), `inventory.py`
   (JS-bundle path-mining, pure).
 - `inventory/build_inventory.py` — mines endpoints under `[inventory].path_prefixes`
-  (default `/api/`) from the target's JS bundles → `inventory/api_endpoints.json`.
+  (default `/api/`) from the target's JS bundles → `inventory/api_endpoints.json`
+  (all outputs are relative to the scope's output dir, see `[output]`).
 - `runners/` — one file per check; all read-only (GET/OPTIONS), throttled, config-driven.
 - `report.py` — aggregates `results/*.jsonl` → `results/report.md`.
 - `workflow/verify_findings.workflow.js` — agentic adversarial verification (fan-out
@@ -52,6 +53,7 @@ scope.toml ──┐
 | `[bfla]` `admin_prefixes` | admin/RBAC path prefixes for r3_rbac_bfla |
 | `[[bola.collectors]]` | list-endpoint → by-id probe templates for r3_bola (`collection_key` may be dotted; optional `id_field`, default `id`) |
 | `[inventory]` `path_prefixes` | literal path prefixes mined from JS bundles (default `["/api/"]`) |
+| `[output]` `dir` | where `results/` + `inventory/` are written (default: the scope file's directory; relative values resolve against it) |
 
 ## CLI / env reference
 
@@ -59,7 +61,7 @@ scope.toml ──┐
 |---|---|---|
 | `make <target>` | Makefile | `setup setup-browser inventory recon authmatrix cron bola bfla report all lint typecheck test audit check changelog_new changelog_preview changelog_release clean` |
 | `ENV=/path/.env` | make var | env file sourced for tokens |
-| `RECON_SCOPE=/path/scope.toml` | env (any runner) | scope file instead of `./scope.toml`; relative to the shell cwd; a missing file aborts naming the resolved path |
+| `RECON_SCOPE=/path/scope.toml` | env (any runner) | scope file instead of `./scope.toml`; relative to the shell cwd; a missing file aborts naming the resolved path; also selects the output location (see `[output]`) |
 | `VERSION=X.Y.Z` | `make changelog_release` | version the scriv fragments are collected under |
 | `gh workflow run …` | GitHub Actions | release flow: `bump-my-version.yaml -f bump_type=major\|minor\|patch`, `publish-release.yaml -f tag=vX.Y.Z` — see [CONTRIBUTING](../CONTRIBUTING.md#releasing) |
 | `[rate].*` | scope.toml | concurrency / per-host spacing |

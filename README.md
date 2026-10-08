@@ -93,9 +93,17 @@ make all              # authmatrix + cron + bola + bfla + report
 ```
 
 Override the env-file location: `make authmatrix ENV=/path/to/.env`.
-Point any runner at a different scope file: `RECON_SCOPE=scope.acme.toml make authmatrix`
-(relative to your shell cwd; default `scope.toml`). See
-[CLI / env reference](docs/architecture.md#cli--env-reference).
+Multiple targets: keep one directory per target and point any runner at its scope file —
+outputs land next to it, so targets never share `results/` or `inventory/`:
+
+```bash
+mkdir -p targets/acme && cp scope.example.toml targets/acme/scope.toml   # edit it
+RECON_SCOPE=targets/acme/scope.toml make authmatrix   # -> targets/acme/results/
+```
+
+`RECON_SCOPE` is relative to your shell cwd (default `scope.toml` → repo-root outputs);
+`[output].dir` in the scope file overrides the output location. `make clean` only removes
+the repo-root `results/`. See [CLI / env reference](docs/architecture.md#cli--env-reference).
 
 ## Fork / bulk model
 
