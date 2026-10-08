@@ -1,4 +1,5 @@
 """Tests for lib.inventory's JS-bundle path-mining logic (pure, no network)."""
+
 from lib.inventory import chunk_urls, crawl, endpoints, harvest_paths, script_urls
 
 HOST = "example.test"
@@ -7,9 +8,7 @@ PAGE = "https://example.test/app/"
 
 def test_harvest_paths_matches_only_configured_prefixes_deduped_sorted() -> None:
     chunks = {
-        "a.js": (
-            'fetch("/api/users/"); x=\'/v1/items\'; y=`/internal/x`; z="/api/users"'
-        ),
+        "a.js": ('fetch("/api/users/"); x=\'/v1/items\'; y=`/internal/x`; z="/api/users"'),
     }
     assert harvest_paths(chunks, ("/api/", "/v1/")) == ["/api/users", "/v1/items"]
 

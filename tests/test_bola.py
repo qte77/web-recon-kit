@@ -1,4 +1,5 @@
 """Tests for lib.bola's resource-id extraction (pure, no network)."""
+
 import pytest
 
 from lib.bola import extract_ids

@@ -5,6 +5,7 @@ Requires identities `owner` and `tenant_b` (2nd workspace). Read-only GETs.
 `collection_key` may be dotted (e.g. "data.result.items"); `id_field` defaults to "id".
     uv run python runners/r3_bola.py
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -39,8 +40,10 @@ async def main() -> None:
     owner, tenant_b = ids.get("owner"), ids.get("tenant_b")
     if not owner or not owner["available"] or not tenant_b or not tenant_b["available"]:
         print("SKIP r3_bola: needs both `owner` and `tenant_b` tokens.")
-        print("Provision a 2nd tenant and set its API key (identity 'tenant_b' in "
-              "scope.toml) in .env, then re-run.")
+        print(
+            "Provision a 2nd tenant and set its API key (identity 'tenant_b' in "
+            "scope.toml) in .env, then re-run."
+        )
         return
 
     thr = Throttle(scope["rate"]["max_concurrency"], scope["rate"]["per_host_delay_ms"])
@@ -49,7 +52,10 @@ async def main() -> None:
     async with httpx.AsyncClient(follow_redirects=False) as client:
         for c in collectors:
             kind, list_path, key, template = (
-                c["kind"], c["list_path"], c["collection_key"], c["probe_template"],
+                c["kind"],
+                c["list_path"],
+                c["collection_key"],
+                c["probe_template"],
             )
             status, data = await get_json(client, thr, base, list_path, owner["token"])
             resource_ids = extract_ids(data, key, c.get("id_field", "id"))
@@ -61,9 +67,16 @@ async def main() -> None:
                 own = await get(client, thr, base, probe, owner["token"])
                 other = await get(client, thr, base, probe, tenant_b["token"])
                 leak = other["status"] == 200
-                rows.append({"kind": kind, "resource_id": rid, "probe_path": probe,
-                             "owner_status": own["status"], "tenant_b_status": other["status"],
-                             "leak": leak})
+                rows.append(
+                    {
+                        "kind": kind,
+                        "resource_id": rid,
+                        "probe_path": probe,
+                        "owner_status": own["status"],
+                        "tenant_b_status": other["status"],
+                        "leak": leak,
+                    }
+                )
                 flag = "  <-- CROSS-TENANT LEAK" if leak else ""
                 print(f"  [{kind}] {probe}  owner={own['status']} tenant_b={other['status']}{flag}")
 

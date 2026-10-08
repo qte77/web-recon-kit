@@ -5,6 +5,7 @@ DNS lookups go to public DoH resolvers (JSON API), never to the target; the targ
 only `GET http://<d>/` + `GET https://<d>/`. A failed lookup or fetch is reported as
 `dns_lookup` / `headers_fetch`, never as a missing record or header.
 """
+
 from __future__ import annotations
 
 import re
@@ -93,8 +94,10 @@ async def doh_query(
         async with throttle:
             try:
                 r = await client.get(
-                    url, params={"name": name, "type": rtype},
-                    headers={"Accept": "application/dns-json"}, timeout=timeout,
+                    url,
+                    params={"name": name, "type": rtype},
+                    headers={"Accept": "application/dns-json"},
+                    timeout=timeout,
                 )
             except (httpx.HTTPError, OSError):
                 continue
@@ -133,8 +136,8 @@ def parse_caa(data: str) -> tuple[str, str] | None:
         if len(raw) < 2:
             return None
         tag_len = raw[1]
-        tag = raw[2:2 + tag_len].decode(errors="replace")
-        return tag.lower(), raw[2 + tag_len:].decode(errors="replace")
+        tag = raw[2 : 2 + tag_len].decode(errors="replace")
+        return tag.lower(), raw[2 + tag_len :].decode(errors="replace")
     parts = data.split(None, 2)
     if len(parts) != 3:
         return None
@@ -155,8 +158,13 @@ def _dmarc_tags(record: str) -> dict[str, str]:
 
 
 def _finding(domain: str, check: str, ok: bool, detail: str) -> PostureFinding:
-    return {"domain": domain, "check": check, "severity": SEVERITY[check], "ok": ok,
-            "detail": detail}
+    return {
+        "domain": domain,
+        "check": check,
+        "severity": SEVERITY[check],
+        "ok": ok,
+        "detail": detail,
+    }
 
 
 def check_dns(
@@ -167,8 +175,14 @@ def check_dns(
     no_mail = cfg["mail_profile"] == "none"
     failed = [label for label in QUERIES if q.get(label) is None]
     if failed:
-        out.append(_finding(domain, "dns_lookup", False,
-                            f"DoH lookup failed on every resolver: {', '.join(failed)}"))
+        out.append(
+            _finding(
+                domain,
+                "dns_lookup",
+                False,
+                f"DoH lookup failed on every resolver: {', '.join(failed)}",
+            )
+        )
 
     if (txt := q.get("TXT")) is not None:
         spf = [t for t in txt_strings(txt) if _is_spf(t)]
@@ -178,8 +192,14 @@ def check_dns(
 
     if (dm := q.get("DMARC")) is not None:
         records = [t for t in txt_strings(dm) if t.lower().startswith("v=dmarc1")]
-        out.append(_finding(domain, "dmarc", len(records) == 1,
-                            f"{len(records)} DMARC record(s) at _dmarc.{domain}, want exactly 1"))
+        out.append(
+            _finding(
+                domain,
+                "dmarc",
+                len(records) == 1,
+                f"{len(records)} DMARC record(s) at _dmarc.{domain}, want exactly 1",
+            )
+        )
         if len(records) == 1:
             policy = _dmarc_tags(records[0]).get("p", "").lower()
             minimum: DmarcPolicy = "reject" if no_mail else cfg["dmarc_min_policy"]
@@ -189,27 +209,45 @@ def check_dns(
 
     if no_mail and (mx := q.get("MX")) is not None:
         records = [" ".join(r.split()) for r in _data(mx, _RTYPE["MX"])]
-        out.append(_finding(domain, "null_mx", records == ["0 ."],
-                            f"MX {records}, want a null MX (RFC 7505: 0 .)"))
+        out.append(
+            _finding(
+                domain,
+                "null_mx",
+                records == ["0 ."],
+                f"MX {records}, want a null MX (RFC 7505: 0 .)",
+            )
+        )
 
     if (caa := q.get("CAA")) is not None:
         parsed = [p for p in map(parse_caa, _data(caa, _RTYPE["CAA"])) if p]
-        issuers = sorted({v.split(";")[0].strip() for t, v in parsed
-                          if t in ("issue", "issuewild")})
+        issuers = sorted(
+            {v.split(";")[0].strip() for t, v in parsed if t in ("issue", "issuewild")}
+        )
         if cfg["require_caa"]:
             out.append(_finding(domain, "caa", bool(parsed), f"CAA issuers: {issuers or 'none'}"))
         if cfg["caa_issuers"]:
             allowed = set(cfg["caa_issuers"]) | set(cfg["caa_extra_issuers"])
             unexpected = [i for i in issuers if i and i not in allowed]
-            out.append(_finding(domain, "caa_issuers", not unexpected,
-                                f"unexpected CAA issuers: {unexpected or 'none'}"))
+            out.append(
+                _finding(
+                    domain,
+                    "caa_issuers",
+                    not unexpected,
+                    f"unexpected CAA issuers: {unexpected or 'none'}",
+                )
+            )
 
     if cfg["require_dnssec"] and (ds := q.get("DS")) is not None:
         has_ds = bool(_data(ds, _RTYPE["DS"]))
         validated = bool(ds.get("AD"))
-        out.append(_finding(domain, "dnssec", has_ds and validated,
-                            f"DS {'present' if has_ds else 'missing'}, "
-                            f"AD {'set' if validated else 'unset'}"))
+        out.append(
+            _finding(
+                domain,
+                "dnssec",
+                has_ds and validated,
+                f"DS {'present' if has_ds else 'missing'}, AD {'set' if validated else 'unset'}",
+            )
+        )
     return out
 
 
@@ -224,13 +262,20 @@ def check_headers(
     follow) and `GET http://<d>/` (expected: a 301/308 to https)."""
     out: list[PostureFinding] = []
     if http["status"] is None:
-        out.append(_finding(domain, "https_redirect", True,
-                            "no plain-HTTP response (port 80 unreachable)"))
+        out.append(
+            _finding(domain, "https_redirect", True, "no plain-HTTP response (port 80 unreachable)")
+        )
     else:
         ok = http["status"] in (301, 308) and http["location"].startswith("https://")
-        out.append(_finding(domain, "https_redirect", ok,
-                            f"http:// -> {http['status']} {http['location'] or '(no Location)'}"
-                            ", want 301/308 to https://"))
+        out.append(
+            _finding(
+                domain,
+                "https_redirect",
+                ok,
+                f"http:// -> {http['status']} {http['location'] or '(no Location)'}"
+                ", want 301/308 to https://",
+            )
+        )
 
     if https_status is None:
         out.append(_finding(domain, "headers_fetch", False, f"GET https://{domain}/ failed"))
@@ -240,15 +285,36 @@ def check_headers(
     m = _MAX_AGE.search(hsts)
     age = int(m.group(1)) if m else None
     sub = "includeSubDomains" if "includesubdomains" in hsts.lower() else "no includeSubDomains"
-    out.append(_finding(domain, "hsts", age is not None and age >= cfg["hsts_min_max_age"],
-                        f"max-age={age}, {sub}, want max-age >= {cfg['hsts_min_max_age']}"
-                        if hsts else "Strict-Transport-Security missing"))
+    out.append(
+        _finding(
+            domain,
+            "hsts",
+            age is not None and age >= cfg["hsts_min_max_age"],
+            f"max-age={age}, {sub}, want max-age >= {cfg['hsts_min_max_age']}"
+            if hsts
+            else "Strict-Transport-Security missing",
+        )
+    )
     nosniff = headers.get("x-content-type-options", "")
-    out.append(_finding(domain, "nosniff", nosniff.strip().lower() == "nosniff",
-                        f"X-Content-Type-Options: {nosniff or 'missing'}"))
-    for check, name in (("csp", "content-security-policy"),
-                        ("referrer_policy", "referrer-policy"),
-                        ("permissions_policy", "permissions-policy")):
-        out.append(_finding(domain, check, name in headers,
-                            f"{name}: {'present' if name in headers else 'missing'}"))
+    out.append(
+        _finding(
+            domain,
+            "nosniff",
+            nosniff.strip().lower() == "nosniff",
+            f"X-Content-Type-Options: {nosniff or 'missing'}",
+        )
+    )
+    for check, name in (
+        ("csp", "content-security-policy"),
+        ("referrer_policy", "referrer-policy"),
+        ("permissions_policy", "permissions-policy"),
+    ):
+        out.append(
+            _finding(
+                domain,
+                check,
+                name in headers,
+                f"{name}: {'present' if name in headers else 'missing'}",
+            )
+        )
     return out

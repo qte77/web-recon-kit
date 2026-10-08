@@ -3,6 +3,7 @@ Reads the scope's results dir (see lib.client.output_dir); falls back to ./resul
 when no scope file exists.
     uv run python report.py
 """
+
 from __future__ import annotations
 
 import json
@@ -28,8 +29,11 @@ def read(name: str) -> list[dict[str, object]]:
     path = results_root() / name
     if not path.exists():
         return []
-    return [cast("dict[str, object]", json.loads(line))
-            for line in path.read_text().splitlines() if line.strip()]
+    return [
+        cast("dict[str, object]", json.loads(line))
+        for line in path.read_text().splitlines()
+        if line.strip()
+    ]
 
 
 def section_authmatrix(md: list[str]) -> None:
@@ -40,8 +44,11 @@ def section_authmatrix(md: list[str]) -> None:
     by_status: Counter[str] = Counter(f"{r['identity']}:{r['status']}" for r in rows)
     md.append(f"- {len(rows)} probes across identities.")
     exposed = sorted(
-        {str(r["path"]) for r in rows
-         if r["identity"] == "noauth" and r["status"] == 200 and not r.get("public", False)}
+        {
+            str(r["path"])
+            for r in rows
+            if r["identity"] == "noauth" and r["status"] == 200 and not r.get("public", False)
+        }
     )
     md.append(f"- **Unauth-200 (non-public review): {len(exposed)}**")
     for p in exposed:
@@ -93,9 +100,11 @@ def section_recon(md: list[str]) -> None:
     for r in rows:
         errs = len(cast(list[object], r.get("console_errors", [])))
         weak_cookies = len(cast(list[object], r.get("cookie_findings", [])))
-        md.append(f"- `{r['route']}` → {r['gate']} (doc {r['doc_http']}, "
-                  f"final `{r['final_url']}`, {errs} console errors, "
-                  f"{weak_cookies} weak cookies)")
+        md.append(
+            f"- `{r['route']}` → {r['gate']} (doc {r['doc_http']}, "
+            f"final `{r['final_url']}`, {errs} console errors, "
+            f"{weak_cookies} weak cookies)"
+        )
 
 
 def section_posture(md: list[str]) -> None:
@@ -105,16 +114,21 @@ def section_posture(md: list[str]) -> None:
     failing = [r for r in rows if not r["ok"]]
     domains = sorted({str(r["domain"]) for r in rows})
     md.append("## Posture (DNS + HTTP headers)\n")
-    md.append(f"- {len(rows)} checks across {len(domains)} domain(s); "
-              f"**{len(failing)} failing**.")
+    md.append(f"- {len(rows)} checks across {len(domains)} domain(s); **{len(failing)} failing**.")
     for r in failing:
         md.append(f"  - `{r['domain']}` {r['check']} ({r['severity']}): {r['detail']}")
 
 
 def main() -> None:
     md: list[str] = ["# web-recon-kit — aggregated results\n"]
-    for fn in (section_posture, section_recon, section_authmatrix, section_cron,
-               section_bola, section_bfla):
+    for fn in (
+        section_posture,
+        section_recon,
+        section_authmatrix,
+        section_cron,
+        section_bola,
+        section_bfla,
+    ):
         before = len(md)
         fn(md)
         if len(md) > before:  # only separate sections that wrote something

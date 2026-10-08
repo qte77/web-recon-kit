@@ -1,4 +1,5 @@
 """Pure Set-Cookie security-flag audit for runners/r1_recon.py (mypy --strict clean)."""
+
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -36,8 +37,10 @@ def audit_set_cookie(headers: Sequence[str]) -> list[CookieFinding]:
         finding = parse_set_cookie(header)
         if finding is None:
             continue
-        if finding["missing_httponly"] or finding["missing_secure"] or (
-            finding["samesite"] in {"none", "unset"}
+        if (
+            finding["missing_httponly"]
+            or finding["missing_secure"]
+            or (finding["samesite"] in {"none", "unset"})
         ):
             findings.append(finding)
     return findings

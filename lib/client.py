@@ -4,6 +4,7 @@ Only httpx (PEP 561-typed) + stdlib. Read-only GET/OPTIONS by design.
 Scope file: scope.toml at the repo root, or $RECON_SCOPE (relative to cwd).
 Outputs (results/, inventory/) go next to the scope file unless `[output].dir` is set.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -93,8 +94,11 @@ def identities(scope: Scope) -> dict[str, ResolvedIdentity]:
     for name, spec in scope["identities"].items():
         tok = os.environ.get(spec["env"], "")
         out[name] = {
-            "env": spec["env"], "role": spec["role"], "workspace": spec["workspace"],
-            "token": tok, "available": bool(tok),
+            "env": spec["env"],
+            "role": spec["role"],
+            "workspace": spec["workspace"],
+            "token": tok,
+            "available": bool(tok),
         }
     return out
 

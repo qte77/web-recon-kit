@@ -1,4 +1,5 @@
 """Shared typed schemas for the assessment harness (mypy --strict clean)."""
+
 from __future__ import annotations
 
 from typing import Literal, NotRequired, TypedDict

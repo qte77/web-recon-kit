@@ -1,4 +1,5 @@
 """Tests for lib.browser's optional-import guard (no real polyfetch_scrape needed)."""
+
 import sys
 import types
 from typing import cast

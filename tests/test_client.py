@@ -1,4 +1,5 @@
 """Smoke tests for the assessment harness core (lib.client, runners.r2_cron_auth)."""
+
 import time
 from collections.abc import Callable
 from pathlib import Path

@@ -7,6 +7,7 @@ an INVALID cron-secret, expecting rejection before side effects) is left as a
 deliberate manual step — see the printed note.
     uv run python runners/r2_cron_auth.py
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -45,10 +46,14 @@ async def main() -> None:
 
     write_jsonl(scope, "cron_auth.jsonl", rows)
     print(f"\n{len(eps)} cron endpoints probed (GET, no auth).")
-    print("405 = route exists but GET not allowed; this does NOT prove the POST "
-          "path is authenticated.")
-    print("Manual next step: POST with an INVALID cron-secret and confirm 401/403 "
-          "BEFORE any side effect.")
+    print(
+        "405 = route exists but GET not allowed; this does NOT prove the POST "
+        "path is authenticated."
+    )
+    print(
+        "Manual next step: POST with an INVALID cron-secret and confirm 401/403 "
+        "BEFORE any side effect."
+    )
 
 
 if __name__ == "__main__":
