@@ -87,7 +87,7 @@ Cloudflare → Google, overridable list; keep #56/#55 as specced; full plan doc.
 | 1 | ~~Merge #54 (urllib3, alert #8)~~ | 0 | agent | DONE — #54 merged 2026-10-08 08:25; 0 open alerts |
 | 2 | ~~Merge #52, #53~~ | 0 | agent | DONE — #52 closed by Dependabot, superseded by #58 (merged); #53 merged |
 | 3 | Close 0001 in place (CLOSED banner, row 7 DONE w/ #52–#54) + add this doc + roadmap link | 0 | agent | DONE — [PR #57](https://github.com/qte77/web-recon-kit/pull/57) |
-| 4 | ~~`.gitignore`~~ (PR #TBD): `scope.*.toml` + `!scope.example.toml`, `**/inventory/api_endpoints.json` | 0 | agent | `git check-ignore` ignores `scope.acme.toml`, `targets/x/scope.toml`, `targets/x/inventory/api_endpoints.json`, `targets/x/results/a.jsonl`; NOT `scope.example.toml` |
+| 4 | ~~`.gitignore`~~ ([PR #59](https://github.com/qte77/web-recon-kit/pull/59)): `scope.*.toml` + `!scope.example.toml`, `**/inventory/api_endpoints.json` | 0 | agent | `git check-ignore` ignores `scope.acme.toml`, `targets/x/scope.toml`, `targets/x/inventory/api_endpoints.json`, `targets/x/results/a.jsonl`; NOT `scope.example.toml` |
 | 5 | #41 per-scope output dir | 0 | agent | tests + dry run (two scope dirs → separate outputs, root untouched); `Closes #41` |
 | 6 | #56 `--no-browser` static crawl | A | agent | non-empty inventory from code-split fixture, chunk cap tested; `Closes #56` |
 | 7a | #55 DoH client + DNS checks | B | agent | fixture tests incl. fallback + split TXT; `Refs #55` |
