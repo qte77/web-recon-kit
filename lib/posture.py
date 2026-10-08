@@ -19,9 +19,9 @@ from lib.client import Throttle
 from lib.types import (
     DmarcPolicy,
     DohResponse,
-    GetResult,
     PostureFinding,
     PostureSettings,
+    ProbeResult,
     Scope,
     Severity,
 )
@@ -50,6 +50,7 @@ SEVERITY: dict[str, Severity] = {
     "caa_issuers": "low",
     "dnssec": "low",
     "headers_fetch": "info",
+    "http_probe": "info",
     "https_redirect": "medium",
     "hsts": "medium",
     "csp": "low",
@@ -256,14 +257,23 @@ def check_headers(
     cfg: PostureSettings,
     https_status: int | None,
     headers: Mapping[str, str],
-    http: GetResult,
+    http: ProbeResult,
 ) -> list[PostureFinding]:
     """Findings from `GET https://<d>/` (status + lower-cased headers, no redirect
-    follow) and `GET http://<d>/` (expected: a 301/308 to https)."""
+    follow) and `GET http://<d>/` (expected: a 301/308 to https). A refused port 80
+    passes (nothing is served over plain HTTP); a timeout / DNS / other failure is an
+    inconclusive `http_probe`, never a pass."""
     out: list[PostureFinding] = []
-    if http["status"] is None:
+    if http["failure"] == "refused":
+        out.append(_finding(domain, "https_redirect", True, "port 80 closed (connection refused)"))
+    elif http["failure"]:
         out.append(
-            _finding(domain, "https_redirect", True, "no plain-HTTP response (port 80 unreachable)")
+            _finding(
+                domain,
+                "http_probe",
+                False,
+                f"inconclusive: {http['failure']} on GET http://{domain}/ — redirect not checked",
+            )
         )
     else:
         ok = http["status"] in (301, 308) and http["location"].startswith("https://")

@@ -87,6 +87,8 @@ scope.toml ──┐
 - `r0_posture` is passive: DNS answers come from public DoH resolvers (`[posture].doh_urls`),
   never the target — but those resolver operators see every domain name queried. The
   target gets two GETs per domain (`http://<d>/`, `https://<d>/`, no redirect follow). A failed
-  lookup is reported as `dns_lookup`, never as a missing record.
+  lookup is reported as `dns_lookup`, never as a missing record. On `http://<d>/`, a
+  refused connection passes the redirect check (nothing is served over plain HTTP); a
+  timeout, DNS or other failure is an inconclusive `http_probe` finding, never a pass.
 - `results/`, `scope.toml`, `scope.*.toml` (except `scope.example.toml`), and
   `inventory/api_endpoints.json` are git-ignored at any depth.

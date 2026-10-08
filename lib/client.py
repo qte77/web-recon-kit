@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import socket
 import time
 import tomllib
 from collections.abc import Mapping, Sequence
@@ -19,7 +20,14 @@ from urllib.parse import urlparse
 
 import httpx
 
-from lib.types import BolaCollector, GetResult, ResolvedIdentity, Scope
+from lib.types import (
+    BolaCollector,
+    GetResult,
+    ProbeFailure,
+    ProbeResult,
+    ResolvedIdentity,
+    Scope,
+)
 
 ROOT: Path = Path(__file__).resolve().parent.parent
 SCOPE_ENV = "RECON_SCOPE"
@@ -188,6 +196,44 @@ async def get_headers(
                 return r.status_code, {k.lower(): v for k, v in r.headers.items()}
         except (httpx.HTTPError, OSError):
             return None, {}
+
+
+def _failure_kind(exc: BaseException) -> ProbeFailure:
+    # Reason: httpx raises ConnectError for both a refused port and a DNS failure; only
+    # the underlying cause (ConnectionRefusedError vs socket.gaierror) tells them apart.
+    if isinstance(exc, httpx.TimeoutException):
+        return "timeout"
+    seen: set[int] = set()
+    cur: BaseException | None = exc
+    while cur is not None and id(cur) not in seen:
+        seen.add(id(cur))
+        if isinstance(cur, ConnectionRefusedError):
+            return "refused"
+        if isinstance(cur, socket.gaierror):
+            return "dns"
+        cur = cur.__cause__ or cur.__context__
+    return "error"
+
+
+async def probe(
+    client: httpx.AsyncClient,
+    throttle: Throttle,
+    base: str,
+    path: str,
+    timeout: int = 20,
+) -> ProbeResult:
+    """Throttled GET returning status + Location (body not read), or why no response
+    came back (`failure`). Never raises."""
+    async with throttle:
+        try:
+            async with client.stream("GET", base + path, timeout=timeout) as r:
+                return {
+                    "status": r.status_code,
+                    "location": r.headers.get("location", ""),
+                    "failure": "",
+                }
+        except (httpx.HTTPError, OSError) as e:
+            return {"status": None, "location": "", "failure": _failure_kind(e)}
 
 
 async def get_text(

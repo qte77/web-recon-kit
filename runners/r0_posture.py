@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import httpx
 
-from lib.client import Throttle, get, get_headers, load_scope, write_jsonl
+from lib.client import Throttle, get_headers, load_scope, probe, write_jsonl
 from lib.posture import QUERIES, check_dns, check_headers, doh_query, settings
 from lib.types import DohResponse, PostureFinding
 
@@ -37,7 +37,7 @@ async def main() -> None:
             for label, (template, rtype) in QUERIES.items():
                 name = template.format(d=domain)
                 q[label] = await doh_query(client, thr, cfg["doh_urls"], name, rtype)
-            http = await get(client, thr, f"http://{domain}", "/")
+            http = await probe(client, thr, f"http://{domain}", "/")
             status, headers = await get_headers(client, thr, f"https://{domain}", "/")
             for f in check_dns(domain, cfg, q) + check_headers(domain, cfg, status, headers, http):
                 rows.append(f)
