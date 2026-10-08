@@ -55,7 +55,9 @@ lint-md:             ## markdownlint-cli2 + lychee (offline) with the shared qte
 	curl -fsSL $(SHARED_LINT)/.markdownlint.jsonc -o .markdownlint.jsonc
 	curl -fsSL $(SHARED_LINT)/lychee.toml -o lychee.toml
 	markdownlint-cli2
-	lychee --offline --no-progress $$(git ls-files '*.md')
+	# Only .md files that exist: tracked + untracked-not-ignored, minus deletions not yet
+	# staged (e.g. fragments `scriv collect` just removed) — lychee crashes on a missing input.
+	lychee --offline --no-progress $$(for f in $$(git ls-files -co --exclude-standard '*.md'); do [ -f "$$f" ] && echo "$$f"; done)
 
 typecheck:           ## mypy --strict
 	uv run mypy
