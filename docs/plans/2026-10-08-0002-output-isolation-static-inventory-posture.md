@@ -3,8 +3,8 @@
 **Start here — this file is the complete context for this arc.** Read only this file; the
 exploration behind it is done (see "Source map"). Do not re-map the codebase.
 
-**Status (2026-10-08, end of run):** rows 1–7b done and merged (#54, #58, #53, #57, #59,
-#60, #61, #62, #63); docs audit #64; released **v0.3.0** (#65, interim manual bump per #25).
+**Status (2026-10-08, end of run):** rows 1–7b done and merged (#54, #58, #53, #57,
+PRs #59–#63); docs audit #64; released **v0.3.0** (#65, interim manual bump per #25).
 Arc 0001 (`docs/plans/0001-housekeeping-and-issue-backlog.md`) is
 CLOSED; its leftovers are rows 8 and D1–D4 below.
 
@@ -16,6 +16,7 @@ with no check-ins. Each row: branch (`chore/…`, `fix/…`, `feat/…`), RED �
 fragment → strike own row (PR number via a follow-up commit on the same branch) → full
 gate → PR → watch all checks → merge → `git switch main && git fetch --prune && git merge
 --ff-only origin/main` → one-line progress note (shipped · next · % · blocked).
+
 - **Decide-by-default on drift:** a row already done by someone else → verify, strike it with
   the actual PR/evidence, continue. A new Dependabot PR → merge it like rows 1–2 if green.
   New issues → add a deferred row, don't implement.
@@ -45,8 +46,8 @@ parallel lanes are wanted. Commands pre-staged in "Access checklist".
 
 **Key commands:** every `gh`/`git push`: `env -u GH_TOKEN -u GITHUB_TOKEN …`. Gate before
 push: `uv run ruff check . && uv run mypy && uv run pytest --cov && uv run pip-audit`, plus
-`uv run ruff format --check <changed .py>`, `markdownlint` (ignore MD013 — local config
-mismatch) + `lychee --offline` on changed .md, `actionlint`/`zizmor --offline` if a workflow
+`uv run ruff format --check <changed .py>`, `make lint-md` (shared qte77/.github configs, all
+tracked .md), `actionlint`/`zizmor --offline` if a workflow
 changes. Merge agent PRs: `gh pr checks N --watch` until all green, then `gh pr merge N
 --admin --squash --delete-branch`; Dependabot PRs too (owner, 2026-10-08: always `--admin
 --squash`, never modify rulesets; `--admin` still needs CodeFactor reported). BEHIND →
@@ -105,15 +106,18 @@ Cloudflare → Google, overridable list; keep #56/#55 as specced; full plan doc.
 ## Slice specs (HOW — the table above is WHAT)
 
 ### Row 4 · .gitignore
+
 Add `scope.*.toml`, `!scope.example.toml`, `**/inventory/api_endpoints.json`. No test
 (config); proof = the `git check-ignore` matrix. Update `docs/architecture.md:78`
 safety-invariant bullet. Fragment (Security).
 
 ### Row 5 · #41 — output dir = scope-file dir, `[output].dir` overrides
+
 `output_dir(scope)` = `[output].dir` resolved against the scope file's directory if set,
 else the scope file's directory; `scope_path()` resolved first (it returns the raw override,
 `Path("scope.acme.toml").parent == "."`). Default `./scope.toml` → repo root → no behavior
 change. Documented layout: `targets/<name>/scope.toml` → `targets/<name>/{results,inventory}/`.
+
 - RED `tests/test_client.py` (style of the RECON_SCOPE tests :179-233, `monkeypatch` +
   `tmp_path`): default → `ROOT`; `RECON_SCOPE=tmp/a/scope.toml` → `tmp/a`; `[output].dir
   = "out/acme"` → `tmp/a/out/acme`; absolute dir as-is; `write_jsonl` creates parents
@@ -132,6 +136,7 @@ change. Documented layout: `targets/<name>/scope.toml` → `targets/<name>/{resu
   Fragment (Added).
 
 ### Row 6 · #56 — `build_inventory.py --no-browser`
+
 - Prereq: move `render_session = require_render_session()` from module level into the
   browser path of `mine()` (else `--no-browser` exits 2 at import). Re-verify
   `.github/workflows/browser-tier.yml` still imports `polyfetch_scrape` directly first.
@@ -150,12 +155,14 @@ change. Documented layout: `targets/<name>/scope.toml` → `targets/<name>/{resu
 - Docs: README Two tiers, architecture.md, polyfetch-integration.md, scope.example.toml.
 
 ### Rows 7a/7b · #55 — `runners/r0_posture.py`
+
 DoH (verified at vendor docs 2026-10-08): Cloudflare `https://cloudflare-dns.com/dns-query`
-+ `Accept: application/dns-json`; Google `https://dns.google/resolve` (GET). Same JSON:
+with `Accept: application/dns-json`; Google `https://dns.google/resolve` (GET). Same JSON:
 `Status, TC, RD, RA, AD, CD, Question, Answer[{name,type,TTL,data}]`; `AD` = DNSSEC
 validated; Google rate-limits with 429 + `Retry-After`. `[posture].doh_urls` default
 `[cloudflare, google]`; next resolver on transport error/5xx/429/non-JSON, not on NXDOMAIN.
 Quad9 documents only RFC 8484 wire format → D5.
+
 - `domains` default = `base_url` host minus leading `www.`; deeper subdomains need explicit
   list (no PSL dependency).
 - 7a (`lib/posture.py` DNS half): normalise TXT (strip quotes, join split strings) before
@@ -166,7 +173,7 @@ Quad9 documents only RFC 8484 wire format → D5.
   `write_jsonl(scope, …)`: `{domain, check, severity, ok, detail}`.
 - 7b: `lib/client.py` `get_headers(...)` (throttled, never raises, lower-cased dict); two
   GETs per domain: `http://<d>/` (no redirect follow, expect 301/308 → https, via `get()`)
-  + `https://<d>/` headers: HSTS + `max-age ≥ hsts_min_max_age`, CSP, `nosniff`,
+  and `https://<d>/` headers: HSTS + `max-age ≥ hsts_min_max_age`, CSP, `nosniff`,
   `Referrer-Policy`, `Permissions-Policy`. `report.py` "Posture" section, `make posture`.
 - Keys: issue's `[posture]` block + `domains`, `doh_urls`, `caa_issuers`. Passive only
   (DoH + 2 GETs); DoH provider sees target domain names — document in architecture.md.
@@ -207,6 +214,7 @@ Quad9 documents only RFC 8484 wire format → D5.
 
 Rows 1–7b: only the stored `gh` credential (via the env prefix); DoH resolvers are public.
 Rows 8–9 (owner: authorized target, glibc host, `make setup-browser`):
+
 ```bash
 mkdir -p targets/acme && cp scope.example.toml targets/acme/scope.toml   # edit it
 export RECON_SCOPE=targets/acme/scope.toml

@@ -4,8 +4,9 @@
 ENV ?= ./.env
 PY  := uv run python
 LOADENV := set -a; . $(ENV); set +a
+SHARED_LINT := https://raw.githubusercontent.com/qte77/.github/main
 
-.PHONY: setup setup-browser inventory inventory-static posture recon authmatrix cron bola bfla report all lint typecheck test audit check changelog_new changelog_preview changelog_release clean
+.PHONY: setup setup-browser inventory inventory-static posture recon authmatrix cron bola bfla report all lint lint-md typecheck test audit check changelog_new changelog_preview changelog_release clean
 
 setup:               ## install dev + test deps (ruff, mypy, pip-audit, pytest) — default group
 	uv sync
@@ -45,6 +46,12 @@ all: authmatrix cron bola bfla report
 
 lint:                ## ruff
 	uv run ruff check .
+
+lint-md:             ## markdownlint-cli2 + lychee (offline) with the shared qte77/.github configs, as CI
+	curl -fsSL $(SHARED_LINT)/.markdownlint.jsonc -o .markdownlint.jsonc
+	curl -fsSL $(SHARED_LINT)/lychee.toml -o lychee.toml
+	markdownlint-cli2
+	lychee --offline --no-progress $$(git ls-files '*.md')
 
 typecheck:           ## mypy --strict
 	uv run mypy

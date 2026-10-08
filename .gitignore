@@ -12,6 +12,10 @@ scope.*.toml
 # results (may contain workspace data)
 results/
 
+# shared lint rules, fetched from qte77/.github by `make lint-md` (CI fetches them too)
+.markdownlint.jsonc
+lychee.toml
+
 # local agent scratch memory — machine-specific notes, never shared
 MEMORY.md
 

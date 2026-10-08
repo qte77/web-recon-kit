@@ -10,9 +10,10 @@
 the exploration behind it is already done (see "Source map & verified facts" at the end) —
 do not re-explore the codebase or re-run the GitHub audits before acting.
 
-**Status (updated 2026-09-18): arc essentially complete.** Rows 1-15 are all DONE (PRs #26,
-#32-#34, #39-#40, #44-#50; #35 closed unmerged) — every agent-executable item has shipped.
+**Status (updated 2026-09-18): arc essentially complete.** Rows 1-15 are all DONE (PRs
+\#26, #32-#34, #39-#40, #44-#50; #35 closed unmerged) — every agent-executable item has shipped.
 Only two rows remain, neither actionable right now:
+
 - **Row 7** (`data` gate) — waits on the next real Dependabot run against the grouping
   config in PR #39; nothing to do but observe.
 - **Row 16** (`owner` gate) — running the browser-tier recon runner against a real
@@ -20,8 +21,8 @@ Only two rows remain, neither actionable right now:
   `scope.toml` + a glibc host + `uv sync --extra browser`, none of which exist in this
   sandbox.
 D1-D4 stay deferred (upstream-blocked or YAGNI). Verified live 2026-09-18: zero open PRs,
-zero open Dependabot alerts, `dependencies`/`python`/`github-actions` labels exist, #29/#30/
-#13/#38 closed by their PRs, #21/#31/#17/#25/#41 remain open exactly as expected (deferred
+zero open Dependabot alerts, `dependencies`/`python`/`github-actions` labels exist,
+\#29/#30/#13/#38 closed by their PRs, #21/#31/#17/#25/#41 remain open exactly as expected (deferred
 sub-scope or upstream-blocked) — see the remaining-work table for exact PR numbers per row.
 
 **How this arc actually played out** (for anyone auditing the process, not just the
@@ -329,7 +330,7 @@ runner-local ROOTs and load_endpoints/write_jsonl ignore RECON_SCOPE"; body cite
   prefixes + the existing path-char class from build_inventory.py's original regex),
   `harvest_paths(chunks: Mapping[str, object], prefixes) -> list[str]`;
   `inventory/build_inventory.py`: `mine(base, host, prefixes)` uses `harvest_paths`; prints
-  `mined {n} endpoints from {files} JS files` + ` — check [inventory].path_prefixes in
+  `mined {n} endpoints from {files} JS files` plus `— check [inventory].path_prefixes in
   scope.toml` when 0; `main()` passes `inventory_prefixes(scope)`.
 - Docs: scope.example.toml `[inventory]` block (comment: keep trailing slash so `/claim`
   ≠ `/claimant`; default `["/api/"]`); README Layout L46; architecture.md Components +
