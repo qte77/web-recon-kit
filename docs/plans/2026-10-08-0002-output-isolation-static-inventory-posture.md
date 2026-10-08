@@ -50,7 +50,8 @@ push: `uv run ruff check . && uv run mypy && uv run pytest --cov && uv run pip-a
 `uv run ruff format --check <changed .py>`, `markdownlint` (ignore MD013 — local config
 mismatch) + `lychee --offline` on changed .md, `actionlint`/`zizmor --offline` if a workflow
 changes. Merge agent PRs: `gh pr checks N --watch` until all green, then `gh pr merge N
---admin --squash --delete-branch`; Dependabot PRs: plain `--squash`. BEHIND →
+--admin --squash --delete-branch`; Dependabot PRs too (owner, 2026-10-08: always `--admin
+--squash`, never modify rulesets; `--admin` still needs CodeFactor reported). BEHIND →
 `gh api repos/qte77/web-recon-kit/pulls/N/update-branch -X PUT`.
 
 **Watch-outs:** Bash denies cat/grep/head/tail/find/ls → Read tool, `rtk grep`, `git grep`.
@@ -83,10 +84,10 @@ Cloudflare → Google, overridable list; keep #56/#55 as specced; full plan doc.
 
 | # | Item | Lane | Gate | Done-when |
 | --- | --- | --- | --- | --- |
-| 1 | Merge #54 (urllib3, alert #8) | 0 | agent | merged; 0 open alerts |
-| 2 | Merge #52, #53 | 0 | agent | merged; 0 open Dependabot PRs |
+| 1 | ~~Merge #54 (urllib3, alert #8)~~ | 0 | agent | DONE — #54 merged 2026-10-08 08:25; 0 open alerts |
+| 2 | ~~Merge #52, #53~~ | 0 | agent | DONE — #52 closed by Dependabot, superseded by #58 (merged); #53 merged |
 | 3 | Close 0001 in place (CLOSED banner, row 7 DONE w/ #52–#54) + add this doc + roadmap link | 0 | agent | DONE — [PR #57](https://github.com/qte77/web-recon-kit/pull/57) |
-| 4 | `.gitignore`: `scope.*.toml` + `!scope.example.toml`, `**/inventory/api_endpoints.json` | 0 | agent | `git check-ignore` ignores `scope.acme.toml`, `targets/x/scope.toml`, `targets/x/inventory/api_endpoints.json`, `targets/x/results/a.jsonl`; NOT `scope.example.toml` |
+| 4 | ~~`.gitignore`~~ ([PR #59](https://github.com/qte77/web-recon-kit/pull/59)): `scope.*.toml` + `!scope.example.toml`, `**/inventory/api_endpoints.json` | 0 | agent | `git check-ignore` ignores `scope.acme.toml`, `targets/x/scope.toml`, `targets/x/inventory/api_endpoints.json`, `targets/x/results/a.jsonl`; NOT `scope.example.toml` |
 | 5 | #41 per-scope output dir | 0 | agent | tests + dry run (two scope dirs → separate outputs, root untouched); `Closes #41` |
 | 6 | #56 `--no-browser` static crawl | A | agent | non-empty inventory from code-split fixture, chunk cap tested; `Closes #56` |
 | 7a | #55 DoH client + DNS checks | B | agent | fixture tests incl. fallback + split TXT; `Refs #55` |

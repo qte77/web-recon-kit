@@ -75,4 +75,5 @@ scope.toml ──┐
 - Cron/mutation endpoints are never triggered; the cron POST-with-invalid-secret test
   is a deliberate, gated manual step.
 - Per-host spacing keeps load far below any DoS threshold.
-- `results/`, `scope.toml`, and `inventory/api_endpoints.json` are git-ignored.
+- `results/`, `scope.toml`, `scope.*.toml` (except `scope.example.toml`), and
+  `inventory/api_endpoints.json` are git-ignored at any depth.
