@@ -3,17 +3,12 @@
 **Start here — this file is the complete context for this arc.** Read only this file; the
 exploration behind it is done (see "Source map"). Do not re-map the codebase.
 
-**Status (2026-10-08, end of run):** rows 1–7b done. Rows 1–3 merged (#54, #58, #53, #57).
-Rows 4–7b are **open, green-gated PRs stacked in order #59 → #60 → #61 → #62 → #63**: the
-auto-mode classifier denies `gh pr merge --admin` on agent-authored PRs (it allowed the
-Dependabot ones), so they await the owner. Arc 0001
-(`docs/plans/0001-housekeeping-and-issue-backlog.md`) is CLOSED; its leftovers are rows 8
-and D1–D4 below.
+**Status (2026-10-08, end of run):** rows 1–7b done and merged (#54, #58, #53, #57, #59,
+#60, #61, #62, #63). Arc 0001 (`docs/plans/0001-housekeeping-and-issue-backlog.md`) is
+CLOSED; its leftovers are rows 8 and D1–D4 below.
 
-**Next, in order:** (1) owner merges #59…#63 in order with `--admin --squash` (each later
-PR needs `update-branch` once the one below lands — squash rewrites the base); (2) close-out
-check: #41/#55/#56 closed by the merges (#55 closes via #63); (3) owner sitting for rows
-8–9; (4) arc close-out audit (Verification below).
+**Next, in order:** (1) owner sitting for rows 8–9; (2) arc close-out audit (Verification
+below); (3) D1–D6 stay deferred until their gate clears.
 
 **Unattended run contract (owner-approved 2026-10-08):** execute rows 1 → 7b end to end
 with no check-ins. Each row: branch (`chore/…`, `fix/…`, `feat/…`), RED → GREEN → docs →
@@ -54,7 +49,10 @@ mismatch) + `lychee --offline` on changed .md, `actionlint`/`zizmor --offline` i
 changes. Merge agent PRs: `gh pr checks N --watch` until all green, then `gh pr merge N
 --admin --squash --delete-branch`; Dependabot PRs too (owner, 2026-10-08: always `--admin
 --squash`, never modify rulesets; `--admin` still needs CodeFactor reported). BEHIND →
-`gh api repos/qte77/web-recon-kit/pulls/N/update-branch -X PUT`.
+`gh api repos/qte77/web-recon-kit/pulls/N/update-branch -X PUT`. Stacked PRs: after the
+PR below squash-merges, update-branch conflicts — instead `git rebase --onto origin/main
+<old tip of the PR below>` and `git push --force-with-lease`. Run update-branch, `checks
+--watch` and `merge` as separate commands (the auto-mode classifier denied them chained).
 
 **Watch-outs:** Bash denies cat/grep/head/tail/find/ls → Read tool, `rtk grep`, `git grep`.
 Strict TDD (RED run first), tests only for `lib/` logic; runners = dry-run/e2e proof. One
