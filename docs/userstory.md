@@ -8,7 +8,10 @@ API attack surface — with permission, read-only, DoS-free.
 ## Stories
 
 - *As an assessor*, I enumerate a SPA's full `/api/*` surface without guessing, to
-  threat-model the real endpoints — **inventory miner**.
+  threat-model the real endpoints — **inventory miner** (also without a browser:
+  `--no-browser`).
+- *As an assessor*, I check a host's mail-auth, CAA, DNSSEC and security-header baseline
+  without touching more than its front page — **r0_posture**.
 - *As an assessor*, I see which endpoints answer unauthenticated, to spot info-exposure
   — **r2_authmatrix**.
 - *As an assessor*, I confirm cron jobs reject unauthenticated calls without triggering
@@ -20,7 +23,8 @@ API attack surface — with permission, read-only, DoS-free.
 - *As an assessor*, I have my own findings adversarially double-checked before writeup —
   **verify workflow**.
 - *As a maintainer*, the same harness works against any target by editing one config
-  file — **`scope.toml`**.
+  file — **`scope.toml`**; several targets side by side never share outputs —
+  **`targets/<name>/scope.toml`**.
 
 ## Non-goals
 
