@@ -4,7 +4,8 @@
 exploration behind it is done (see "Source map"). Do not re-map the codebase.
 
 **Status (2026-10-08, end of run):** rows 1–7b done and merged (#54, #58, #53, #57, #59,
-#60, #61, #62, #63). Arc 0001 (`docs/plans/0001-housekeeping-and-issue-backlog.md`) is
+#60, #61, #62, #63); docs audit #64; released **v0.3.0** (#65, interim manual bump per #25).
+Arc 0001 (`docs/plans/0001-housekeeping-and-issue-backlog.md`) is
 CLOSED; its leftovers are rows 8 and D1–D4 below.
 
 **Next, in order:** (1) owner sitting for rows 8–9; (2) arc close-out audit (Verification
@@ -99,7 +100,7 @@ Cloudflare → Google, overridable list; keep #56/#55 as specced; full plan doc.
 | D3 | #31 CDP fallback | — | deferred | YAGNI |
 | D4 | #25 automated release | — | deferred | upstream qte77/.github#38 (open) |
 | D5 | DoH wire format (RFC 8484, e.g. Quad9) | — | deferred | YAGNI; needs a binary DNS parser |
-| D6 | Browser-path `_harvest_js` host filter is a substring test (`u.includes(host)`) — look-alike hosts pass; static crawl (row 6) already uses exact netloc | — | deferred | new finding 2026-10-08 (security review of row 6); fix = same exact-origin check in the JS |
+| D6 | Browser-path `_harvest_js` host filter is a substring test (`u.includes(host)`) — look-alike hosts pass; static crawl (row 6) already uses exact netloc | — | deferred | [#66](https://github.com/qte77/web-recon-kit/issues/66) (low; security review of row 6); fix = same exact-origin check in the JS |
 
 ## Slice specs (HOW — the table above is WHAT)
 
