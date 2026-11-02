@@ -8,7 +8,7 @@ Delivery history + direction. Open work is tracked as GitHub issues.
   miner; report aggregator; agentic verify workflow.
 - Config-driven via `scope.toml`; two-tier (API / browser) install.
 - CI: ruff + mypy `--strict` + pytest, blocking pip-audit, CodeQL, gitleaks, Dependabot;
-  SHA-pinned actions. Extracted from `qte77/__kavanah_analysis` (first real engagement).
+  SHA-pinned actions. Extracted from a private engagement (the first real one).
 - `polyfetch-scrape` pinned to a release tag (`@v0.7.0`) for reproducible browser-tier
   installs — a tag plus the `uv.lock`-recorded commit, rather than a git submodule.
 - Coverage gate (80%) over `lib/`, the shared module. The runners and `report.py` are

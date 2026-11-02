@@ -193,8 +193,8 @@ Types of changes:
 
 ### Added
 
-- Initial extraction of the target-agnostic web-recon harness from
-  `qte77/__kavanah_analysis`: `lib/`, `runners/` (r1_recon, r2_authmatrix, r2_cron_auth,
+- Initial extraction of the target-agnostic web-recon harness from a private engagement:
+  `lib/`, `runners/` (r1_recon, r2_authmatrix, r2_cron_auth,
   r2_schemathesis, r3_bola, r3_rbac_bfla), `inventory/build_inventory.py`, `report.py`,
   `workflow/verify_findings.workflow.js`, `tests/`, `scope.example.toml`.
 - CI: ruff, mypy `--strict`, pytest, pip-audit, CodeQL, gitleaks, Dependabot;
